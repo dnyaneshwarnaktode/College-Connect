@@ -9,7 +9,8 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 export default function Projects() {
   const { user } = useAuth();
   const [projects, setProjects] = useState<Project[]>([]);
-  // removed unused loading state
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
@@ -30,18 +31,29 @@ export default function Projects() {
 
   const fetchProjects = async () => {
     try {
+      setLoading(true);
+      setError(null);
       const response = await fetch(`${API_BASE_URL}/projects`, {
         headers: getAuthHeaders()
       });
       
-      if (response.ok) {
-        const data = await response.json();
-        setProjects(data.projects || []);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch projects: ${response.status}`);
       }
+      
+      const data = await response.json();
+      const normalizedProjects = (data.projects || []).map((project: any) => ({
+        ...project,
+        id: project._id ? (typeof project._id === 'string' ? project._id : project._id.toString()) : 
+            (project.id ? (typeof project.id === 'string' ? project.id : project.id.toString()) : 
+            String(Date.now() + Math.random()))
+      }));
+      setProjects(normalizedProjects);
     } catch (error) {
       console.error('Error fetching projects:', error);
+      setError(error instanceof Error ? error.message : 'Failed to load projects. Please try again.');
     } finally {
-      // no-op
+      setLoading(false);
     }
   };
 
@@ -63,26 +75,43 @@ export default function Projects() {
     setIsModalOpen(true);
   };
 
-  const handleSaveProject = (projectData: Partial<Project>) => {
-    if (selectedProject) {
-      // Edit existing project
-      setProjects(projects.map(project => 
-        project.id === selectedProject.id 
-          ? { ...project, ...projectData }
-          : project
-      ));
-    } else {
-      // Create new project
-      const { id: _ignoredId, ...restProjectData } = (projectData || {}) as Project;
-      const newProject: Project = {
-        ...restProjectData,
-        id: Date.now().toString(),
-        owner: user?.id || '1',
-        ownerName: user?.name || 'Anonymous',
-        members: [user?.id || '1'],
-        createdAt: new Date().toISOString()
-      };
-      setProjects([...projects, newProject]);
+  const handleSaveProject = async (projectData: Partial<Project>) => {
+    try {
+      setError(null);
+      if (selectedProject) {
+        const response = await fetch(`${API_BASE_URL}/projects/${selectedProject.id}`, {
+          method: 'PUT',
+          headers: getAuthHeaders(),
+          body: JSON.stringify(projectData)
+        });
+        if (!response.ok) {
+          throw new Error('Failed to update project');
+        }
+        await fetchProjects();
+      } else {
+        const payload = {
+          title: projectData.title,
+          description: projectData.description,
+          technologies: projectData.technologies || [],
+          category: projectData.category,
+          status: projectData.status,
+          githubUrl: projectData.githubUrl,
+          liveUrl: projectData.liveUrl,
+          image: (projectData as any)?.image
+        };
+        const response = await fetch(`${API_BASE_URL}/projects`, {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify(payload)
+        });
+        if (!response.ok) {
+          throw new Error('Failed to create project');
+        }
+        await fetchProjects();
+      }
+    } catch (error) {
+      console.error('Error saving project:', error);
+      setError(error instanceof Error ? error.message : 'Failed to save project. Please try again.');
     }
   };
 
@@ -164,8 +193,25 @@ export default function Projects() {
         </div>
       </div>
 
-      {/* Projects Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-200 px-4 py-3 rounded-lg flex items-center justify-between">
+          <span>{error}</span>
+          <button onClick={() => setError(null)} className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200">
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* Loading State */}
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      ) : (
+        <>
+          {/* Projects Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {filteredProjects.map((project) => (
           <div key={project.id} className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow">
             {project.image && (
@@ -265,12 +311,14 @@ export default function Projects() {
         ))}
       </div>
 
-      {filteredProjects.length === 0 && (
-        <div className="text-center py-12">
-          <FolderOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No projects found</h3>
-          <p className="text-gray-600 dark:text-gray-400">Try adjusting your search or filter criteria.</p>
-        </div>
+          {filteredProjects.length === 0 && (
+            <div className="text-center py-12">
+              <FolderOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No projects found</h3>
+              <p className="text-gray-600 dark:text-gray-400">Try adjusting your search or filter criteria.</p>
+            </div>
+          )}
+        </>
       )}
 
       <ProjectModal

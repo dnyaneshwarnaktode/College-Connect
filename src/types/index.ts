@@ -6,6 +6,7 @@ export interface User {
   avatar?: string;
   department?: string;
   year?: number;
+  phone?: string;
   bio?: string;
   skills?: string[];
   createdAt: string;

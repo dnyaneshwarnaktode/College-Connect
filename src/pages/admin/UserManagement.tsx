@@ -9,12 +9,13 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 export default function UserManagement() {
   const { user } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
-  // removed unused loading state
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | undefined>();
-  // removed unused viewMode state
 
   React.useEffect(() => {
     if (user?.role === 'admin') {
@@ -32,18 +33,29 @@ export default function UserManagement() {
 
   const fetchUsers = async () => {
     try {
+      setLoading(true);
+      setError(null);
       const response = await fetch(`${API_BASE_URL}/users`, {
         headers: getAuthHeaders()
       });
       
-      if (response.ok) {
-        const data = await response.json();
-        setUsers(data.users || []);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch users: ${response.status}`);
       }
+      
+      const data = await response.json();
+      const normalizedUsers = (data.users || []).map((u: any) => ({
+        ...u,
+        id: u._id ? (typeof u._id === 'string' ? u._id : u._id.toString()) : 
+            (u.id ? (typeof u.id === 'string' ? u.id : u.id.toString()) : 
+            String(Date.now() + Math.random()))
+      }));
+      setUsers(normalizedUsers);
     } catch (error) {
       console.error('Error fetching users:', error);
+      setError(error instanceof Error ? error.message : 'Failed to load users');
     } finally {
-      // no-op
+      setLoading(false);
     }
   };
 
@@ -76,30 +88,78 @@ export default function UserManagement() {
     setIsModalOpen(true);
   };
 
-  const handleSaveUser = (userData: Partial<User>) => {
-    if (selectedUser) {
-      // Edit existing user
-      setUsers(users.map(user => 
-        user.id === selectedUser.id 
-          ? { ...user, ...userData }
-          : user
-      ));
-    } else {
-      // Create new user
-      const { id: _ignoredId, ...restUserData } = (userData || {}) as User;
-      const newUser: User = {
-        ...restUserData,
-        id: Date.now().toString(),
-        createdAt: new Date().toISOString()
-      };
-      setUsers([...users, newUser]);
+  const handleSaveUser = async (userData: Partial<User>) => {
+    try {
+      setError(null);
+      
+      if (selectedUser) {
+        // Edit existing user - PUT request
+        const response = await fetch(`${API_BASE_URL}/users/${selectedUser.id}`, {
+          method: 'PUT',
+          headers: getAuthHeaders(),
+          body: JSON.stringify(userData)
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to update user');
+        }
+        
+        // Refresh users list
+        await fetchUsers();
+      } else {
+        // Create new user - POST request
+        const response = await fetch(`${API_BASE_URL}/users`, {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify(userData)
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to create user');
+        }
+        
+        // Refresh users list
+        await fetchUsers();
+      }
+      
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error('Error saving user:', error);
+      setError(error instanceof Error ? error.message : 'Failed to save user');
+      throw error; // Re-throw so modal can handle it
     }
   };
 
-  const handleDeleteUser = (userId: string) => {
-    if (confirm('Are you sure you want to delete this user?')) {
-      setUsers(users.filter(user => user.id !== userId));
+  const handleDeleteUser = async (userId: string) => {
+    if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+      return;
     }
+    
+    try {
+      setError(null);
+      const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to delete user');
+      }
+      
+      // Refresh users list
+      await fetchUsers();
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      setError(error instanceof Error ? error.message : 'Failed to delete user');
+    }
+  };
+
+  const handleViewUser = (user: User) => {
+    setSelectedUser(user);
+    setIsViewModalOpen(true);
   };
 
   const getRoleColor = (role: string) => {
@@ -124,6 +184,26 @@ export default function UserManagement() {
 
   return (
     <div className="space-y-6">
+      {/* Error Banner */}
+      {error && (
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 flex items-center justify-between">
+          <p className="text-red-800 dark:text-red-200">{error}</p>
+          <button
+            onClick={() => setError(null)}
+            className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* Loading State */}
+      {loading && (
+        <div className="flex justify-center items-center py-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">User Management</h1>
@@ -275,6 +355,7 @@ export default function UserManagement() {
                         <Edit2 size={16} />
                       </button>
                       <button
+                        onClick={() => handleViewUser(user)}
                         className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 p-1 rounded"
                         title="View Details"
                       >
@@ -312,6 +393,125 @@ export default function UserManagement() {
         user={selectedUser}
         onSave={handleSaveUser}
       />
+
+      {/* View User Details Modal */}
+      {isViewModalOpen && selectedUser && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">User Details</h2>
+              <button
+                onClick={() => setIsViewModalOpen(false)}
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Profile Section */}
+              <div className="flex items-center space-x-4">
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full overflow-hidden flex-shrink-0">
+                  {selectedUser.avatar ? (
+                    <img src={selectedUser.avatar} alt={selectedUser.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-white font-bold text-2xl">
+                      {selectedUser.name.charAt(0)}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">{selectedUser.name}</h3>
+                  <p className="text-gray-600 dark:text-gray-400">{selectedUser.email}</p>
+                  <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full mt-2 ${getRoleColor(selectedUser.role)}`}>
+                    {selectedUser.role}
+                  </span>
+                </div>
+              </div>
+
+              {/* Details Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Department</p>
+                  <p className="text-base font-medium text-gray-900 dark:text-white">
+                    {selectedUser.department || 'N/A'}
+                  </p>
+                </div>
+
+                {selectedUser.year && (
+                  <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Year</p>
+                    <p className="text-base font-medium text-gray-900 dark:text-white">
+                      Year {selectedUser.year}
+                    </p>
+                  </div>
+                )}
+
+                <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Phone</p>
+                  <p className="text-base font-medium text-gray-900 dark:text-white">
+                    {selectedUser.phone || 'N/A'}
+                  </p>
+                </div>
+
+                <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Member Since</p>
+                  <p className="text-base font-medium text-gray-900 dark:text-white">
+                    {new Date(selectedUser.createdAt).toLocaleDateString('en-US', { 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}
+                  </p>
+                </div>
+              </div>
+
+              {/* Bio Section */}
+              {selectedUser.bio && (
+                <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Bio</p>
+                  <p className="text-base text-gray-900 dark:text-white">{selectedUser.bio}</p>
+                </div>
+              )}
+
+              {/* Skills Section */}
+              {selectedUser.skills && selectedUser.skills.length > 0 && (
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Skills</p>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedUser.skills.map((skill, index) => (
+                      <span
+                        key={index}
+                        className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 text-sm rounded-full"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-end space-x-3">
+              <button
+                onClick={() => {
+                  setIsViewModalOpen(false);
+                  setIsModalOpen(true);
+                }}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+              >
+                Edit User
+              </button>
+              <button
+                onClick={() => setIsViewModalOpen(false)}
+                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

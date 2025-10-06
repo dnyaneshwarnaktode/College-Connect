@@ -21,22 +21,24 @@ const notFound = require('./middleware/notFound');
 
 const app = express();
 
-// Security middleware
-app.use(helmet());
-
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.'
-});
-app.use(limiter);
-
-// CORS configuration
+// CORS configuration (must be before other middleware)
 app.use(cors({
   origin: process.env.CLIENT_URL || 'http://localhost:5173',
   credentials: true
 }));
+
+// Security middleware
+app.use(helmet());
+
+// Rate limiting (more lenient in development)
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: process.env.NODE_ENV === 'development' ? 1000 : 100, // Higher limit in dev mode
+  message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+app.use('/api/', limiter); // Apply only to API routes
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
@@ -86,11 +88,12 @@ const connectDB = async () => {
 
 // Start server
 const PORT = process.env.PORT || 5000;
+let server;
 
 const startServer = async () => {
   await connectDB();
   
-  app.listen(PORT, () => {
+  server = app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
     console.log(`📱 Environment: ${process.env.NODE_ENV}`);
     console.log(`🌐 API Health: http://localhost:${PORT}/api/health`);
@@ -102,7 +105,11 @@ startServer();
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err, promise) => {
   console.log(`Error: ${err.message}`);
-  server.close(() => {
+  if (server) {
+    server.close(() => {
+      process.exit(1);
+    });
+  } else {
     process.exit(1);
-  });
+  }
 });

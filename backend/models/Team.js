@@ -136,12 +136,6 @@ teamSchema.pre('save', function(next) {
   next();
 });
 
-// Close team if it reaches maximum capacity
-teamSchema.pre('save', function(next) {
-  if (this.currentMembers >= this.maxMembers) {
-    this.isOpen = false;
-  }
-  next();
-});
+// No automatic team closing - teams stay open regardless of member count
 
 module.exports = mongoose.model('Team', teamSchema);

@@ -9,16 +9,21 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 export default function Events() {
   const { user } = useAuth();
   const [events, setEvents] = useState<Event[]>([]);
-  // removed unused loading state
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
+  const [showPastEvents, setShowPastEvents] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | undefined>();
   const [registeredEvents, setRegisteredEvents] = useState<string[]>([]);
 
   React.useEffect(() => {
     fetchEvents();
-  }, []);
+    if (user) {
+      fetchUserRegistrations();
+    }
+  }, [user]);
 
   const getAuthHeaders = () => {
     const token = localStorage.getItem('collegeconnect_token');
@@ -30,26 +35,67 @@ export default function Events() {
 
   const fetchEvents = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/events`, {
+      setLoading(true);
+      setError(null);
+      const response = await fetch(`${API_BASE_URL}/events?limit=100`, {
+        headers: getAuthHeaders()
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch events: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      const normalizedEvents = (data.events || []).map((event: any) => ({
+        ...event,
+        id: event._id ? (typeof event._id === 'string' ? event._id : event._id.toString()) : 
+            (event.id ? (typeof event.id === 'string' ? event.id : event.id.toString()) : 
+            String(Date.now() + Math.random())),
+        registered: event.registeredUsers?.length || 0
+      }));
+      setEvents(normalizedEvents);
+    } catch (error) {
+      console.error('Error fetching events:', error);
+      setError(error instanceof Error ? error.message : 'Failed to load events. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchUserRegistrations = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/me`, {
         headers: getAuthHeaders()
       });
       
       if (response.ok) {
         const data = await response.json();
-        setEvents(data.events || []);
+        const userEventIds = (data.user?.registeredEvents || []).map((eventId: any) => 
+          typeof eventId === 'string' ? eventId : 
+          eventId._id ? (typeof eventId._id === 'string' ? eventId._id : eventId._id.toString()) :
+          eventId.toString()
+        );
+        setRegisteredEvents(userEventIds);
       }
     } catch (error) {
-      console.error('Error fetching events:', error);
-    } finally {
-      // no-op
+      console.error('Error fetching user registrations:', error);
     }
+  };
+
+  const isEventPast = (eventDate: string) => {
+    return new Date(eventDate) < new Date();
+  };
+
+  const isEventFull = (event: Event) => {
+    return event.registered >= event.capacity;
   };
 
   const filteredEvents = events.filter(event => {
     const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          event.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = filterCategory === 'all' || event.category === filterCategory;
-    return matchesSearch && matchesCategory;
+    const matchesPastFilter = showPastEvents || !isEventPast(event.date);
+    return matchesSearch && matchesCategory && matchesPastFilter;
   });
 
   const handleCreateEvent = () => {
@@ -62,38 +108,79 @@ export default function Events() {
     setIsModalOpen(true);
   };
 
-  const handleSaveEvent = (eventData: Partial<Event>) => {
-    if (selectedEvent) {
-      // Edit existing event
-      setEvents(events.map(event => 
-        event.id === selectedEvent.id 
-          ? { ...event, ...eventData, updatedAt: new Date().toISOString() }
-          : event
-      ));
-    } else {
-      // Create new event
-      const { id: _ignoredId, ...restEventData } = (eventData || {}) as Event;
-      const newEvent: Event = {
-        ...restEventData,
-        id: Date.now().toString(),
-        organizer: user?.department || 'Unknown',
-        registered: 0,
-        createdBy: user?.id || '1',
-        createdAt: new Date().toISOString()
-      };
-      setEvents([...events, newEvent]);
+  const handleSaveEvent = async (eventData: Partial<Event>) => {
+    try {
+      setError(null);
+      if (selectedEvent) {
+        const response = await fetch(`${API_BASE_URL}/events/${selectedEvent.id}`, {
+          method: 'PUT',
+          headers: getAuthHeaders(),
+          body: JSON.stringify(eventData)
+        });
+        if (!response.ok) {
+          throw new Error('Failed to update event');
+        }
+        await fetchEvents();
+      } else {
+        const payload = {
+          title: eventData.title,
+          description: eventData.description,
+          date: eventData.date,
+          time: eventData.time,
+          location: eventData.location,
+          category: eventData.category,
+          organizer: eventData.organizer || user?.department || 'Unknown',
+          capacity: eventData.capacity,
+          image: (eventData as any)?.image,
+          tags: (eventData as any)?.tags || []
+        };
+        const response = await fetch(`${API_BASE_URL}/events`, {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify(payload)
+        });
+        if (!response.ok) {
+          throw new Error('Failed to create event');
+        }
+        await fetchEvents();
+      }
+    } catch (error) {
+      console.error('Error saving event:', error);
+      setError(error instanceof Error ? error.message : 'Failed to save event. Please try again.');
     }
   };
 
-  const handleRegisterEvent = (eventId: string) => {
-    if (!registeredEvents.includes(eventId)) {
-      setRegisteredEvents([...registeredEvents, eventId]);
-      setEvents(events.map(event => 
-        event.id === eventId 
-          ? { ...event, registered: event.registered + 1 }
-          : event
-      ));
+  const handleRegisterEvent = async (eventId: string) => {
+    try {
+      setError(null);
+      
+      if (!eventId) {
+        throw new Error('Invalid event ID');
+      }
+      
+      if (!registeredEvents.includes(eventId)) {
+        const response = await fetch(`${API_BASE_URL}/events/${eventId}/register`, {
+          method: 'POST',
+          headers: getAuthHeaders()
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to register for event');
+        }
+        
+        setRegisteredEvents([...registeredEvents, eventId]);
+        await fetchEvents();
+      }
+    } catch (error) {
+      console.error('Error registering for event:', error);
+      setError(error instanceof Error ? error.message : 'Failed to register for event. Please try again.');
     }
+  };
+
+  const handleViewEventDetails = (event: Event) => {
+    setSelectedEvent(event);
+    setIsModalOpen(true);
   };
 
   const getCategoryColor = (category: string) => {
@@ -126,36 +213,66 @@ export default function Events() {
 
       {/* Search and Filter */}
       <div className="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1 relative">
-            <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search events..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 w-full px-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1 relative">
+              <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search events..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 w-full px-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <div className="relative">
+              <Filter size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <select
+                value={filterCategory}
+                onChange={(e) => setFilterCategory(e.target.value)}
+                className="pl-10 pr-8 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-w-[150px]"
+              >
+                <option value="all">All Categories</option>
+                <option value="technical">Technical</option>
+                <option value="cultural">Cultural</option>
+                <option value="sports">Sports</option>
+                <option value="academic">Academic</option>
+              </select>
+            </div>
           </div>
-          <div className="relative">
-            <Filter size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <select
-              value={filterCategory}
-              onChange={(e) => setFilterCategory(e.target.value)}
-              className="pl-10 pr-8 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-w-[150px]"
-            >
-              <option value="all">All Categories</option>
-              <option value="technical">Technical</option>
-              <option value="cultural">Cultural</option>
-              <option value="sports">Sports</option>
-              <option value="academic">Academic</option>
-            </select>
+          <div className="flex items-center">
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={showPastEvents}
+                onChange={(e) => setShowPastEvents(e.target.checked)}
+                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              />
+              <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Show past events</span>
+            </label>
           </div>
         </div>
       </div>
 
-      {/* Events Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-200 px-4 py-3 rounded-lg flex items-center justify-between">
+          <span>{error}</span>
+          <button onClick={() => setError(null)} className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200">
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* Loading State */}
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      ) : (
+        <>
+          {/* Events Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredEvents.map((event) => (
           <div key={event.id} className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow">
             {event.image && (
@@ -169,16 +286,31 @@ export default function Events() {
             )}
             
             <div className="p-6">
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
                 <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getCategoryColor(event.category)}`}>
                   {event.category}
                 </span>
-                <div className="text-sm text-gray-500 dark:text-gray-400">
-                  {event.registered}/{event.capacity} registered
+                <div className="flex items-center gap-2">
+                  {isEventPast(event.date) && (
+                    <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
+                      Expired
+                    </span>
+                  )}
+                  {!isEventPast(event.date) && isEventFull(event) && (
+                    <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
+                      Full
+                    </span>
+                  )}
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    {event.registered}/{event.capacity}
+                  </div>
                 </div>
               </div>
 
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              <h3 
+                onClick={() => handleViewEventDetails(event)}
+                className="text-xl font-semibold text-gray-900 dark:text-white mb-2 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              >
                 {event.title}
               </h3>
               
@@ -207,20 +339,46 @@ export default function Events() {
 
               <div className="flex space-x-2">
                 <button 
-                  onClick={() => handleRegisterEvent(event.id)}
-                  disabled={registeredEvents.includes(event.id)}
-                  className={`flex-1 py-2 px-4 rounded-lg transition-colors font-medium ${
-                    registeredEvents.includes(event.id)
-                      ? 'bg-green-600 text-white cursor-not-allowed'
-                      : 'bg-blue-600 hover:bg-blue-700 text-white'
-                  }`}
+                  onClick={() => handleViewEventDetails(event)}
+                  className="flex-1 py-2 px-4 rounded-lg transition-colors font-medium bg-gray-600 hover:bg-gray-700 text-white"
                 >
-                  {registeredEvents.includes(event.id) ? 'Registered' : 'Register'}
+                  View Details
                 </button>
+                
+                {registeredEvents.includes(event.id) ? (
+                  <button 
+                    disabled
+                    className="flex-1 py-2 px-4 rounded-lg font-medium bg-green-600 text-white cursor-default"
+                  >
+                    ✓ Registered
+                  </button>
+                ) : isEventPast(event.date) ? (
+                  <button 
+                    disabled
+                    className="flex-1 py-2 px-4 rounded-lg font-medium bg-gray-400 text-white cursor-not-allowed"
+                  >
+                    Closed
+                  </button>
+                ) : isEventFull(event) ? (
+                  <button 
+                    disabled
+                    className="flex-1 py-2 px-4 rounded-lg font-medium bg-yellow-500 text-white cursor-not-allowed"
+                  >
+                    Full
+                  </button>
+                ) : (
+                  <button 
+                    onClick={() => handleRegisterEvent(event.id)}
+                    className="flex-1 py-2 px-4 rounded-lg transition-colors font-medium bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    Register
+                  </button>
+                )}
+                
                 {(user?.role === 'admin' || user?.role === 'faculty') && (
                   <button
                     onClick={() => handleEditEvent(event)}
-                    className="px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
+                    className="px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
                   >
                     Edit
                   </button>
@@ -231,12 +389,14 @@ export default function Events() {
         ))}
       </div>
 
-      {filteredEvents.length === 0 && (
-        <div className="text-center py-12">
-          <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No events found</h3>
-          <p className="text-gray-600 dark:text-gray-400">Try adjusting your search or filter criteria.</p>
-        </div>
+          {filteredEvents.length === 0 && (
+            <div className="text-center py-12">
+              <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No events found</h3>
+              <p className="text-gray-600 dark:text-gray-400">Try adjusting your search or filter criteria.</p>
+            </div>
+          )}
+        </>
       )}
 
       <EventModal
@@ -244,6 +404,7 @@ export default function Events() {
         onClose={() => setIsModalOpen(false)}
         event={selectedEvent}
         onSave={handleSaveEvent}
+        viewOnly={registeredEvents.includes(selectedEvent?.id || '')}
       />
     </div>
   );

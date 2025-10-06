@@ -163,7 +163,19 @@ const getMe = async (req, res) => {
 
     res.json({
       success: true,
-      user
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        department: user.department,
+        year: user.year,
+        phone: user.phone,
+        bio: user.bio,
+        skills: user.skills,
+        avatar: user.avatar,
+        createdAt: user.createdAt
+      }
     });
   } catch (error) {
     console.error('Get me error:', error);

@@ -263,14 +263,7 @@ const joinTeam = async (req, res) => {
       });
     }
 
-    // Check capacity
-    const activeMembers = team.members.filter(member => member.isActive);
-    if (activeMembers.length >= team.maxMembers) {
-      return res.status(400).json({
-        success: false,
-        message: 'Team is full'
-      });
-    }
+    // No capacity limit - users can join any number of teams
 
     // Add member
     team.members.push({

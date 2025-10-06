@@ -34,17 +34,31 @@ export default function Dashboard() {
 
       if (eventsRes.ok) {
         const eventsData = await eventsRes.json();
-        setEvents(eventsData.events || []);
+        const normalizedEvents = (eventsData.events || []).map((event: any) => ({
+          ...event,
+          id: event._id ? (typeof event._id === 'string' ? event._id : event._id.toString()) : 
+              (event.id ? (typeof event.id === 'string' ? event.id : event.id.toString()) : 
+              String(Date.now() + Math.random()))
+        }));
+        setEvents(normalizedEvents);
       }
 
       if (postsRes.ok) {
         const postsData = await postsRes.json();
-        setPosts(postsData.posts || []);
+        const normalizedPosts = (postsData.posts || []).map((post: any) => ({
+          ...post,
+          id: post.id || post._id
+        }));
+        setPosts(normalizedPosts);
       }
 
       if (projectsRes.ok) {
         const projectsData = await projectsRes.json();
-        setProjects(projectsData.projects || []);
+        const normalizedProjects = (projectsData.projects || []).map((project: any) => ({
+          ...project,
+          id: project.id || project._id
+        }));
+        setProjects(normalizedProjects);
       }
 
       // no teams used
@@ -96,8 +110,8 @@ export default function Dashboard() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => (
-          <div key={index} className="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
+        {stats.map((stat) => (
+          <div key={stat.title} className="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">

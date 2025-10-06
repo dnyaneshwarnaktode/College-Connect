@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Calendar, MapPin, Users, Clock } from 'lucide-react';
+import { X } from 'lucide-react';
 import { Event } from '../../types';
 
 interface EventModalProps {
@@ -7,9 +7,10 @@ interface EventModalProps {
   onClose: () => void;
   event?: Event;
   onSave: (eventData: Partial<Event>) => void;
+  viewOnly?: boolean;
 }
 
-export default function EventModal({ isOpen, onClose, event, onSave }: EventModalProps) {
+export default function EventModal({ isOpen, onClose, event, onSave, viewOnly = false }: EventModalProps) {
   const [formData, setFormData] = useState({
     title: event?.title || '',
     description: event?.description || '',
@@ -37,7 +38,7 @@ export default function EventModal({ isOpen, onClose, event, onSave }: EventModa
         <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-900 shadow-xl rounded-2xl">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-              {event ? 'Edit Event' : 'Create New Event'}
+              {viewOnly ? 'Event Details' : event ? 'Edit Event' : 'Create New Event'}
             </h3>
             <button
               onClick={onClose}
@@ -58,6 +59,8 @@ export default function EventModal({ isOpen, onClose, event, onSave }: EventModa
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                 required
+                readOnly={viewOnly}
+                disabled={viewOnly}
               />
             </div>
 
@@ -71,6 +74,8 @@ export default function EventModal({ isOpen, onClose, event, onSave }: EventModa
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                 required
+                readOnly={viewOnly}
+                disabled={viewOnly}
               />
             </div>
 
@@ -85,6 +90,7 @@ export default function EventModal({ isOpen, onClose, event, onSave }: EventModa
                   onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                   required
+                  disabled={viewOnly}
                 />
               </div>
               <div>
@@ -97,6 +103,7 @@ export default function EventModal({ isOpen, onClose, event, onSave }: EventModa
                   onChange={(e) => setFormData({ ...formData, time: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                   required
+                  disabled={viewOnly}
                 />
               </div>
             </div>
@@ -111,6 +118,7 @@ export default function EventModal({ isOpen, onClose, event, onSave }: EventModa
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                 required
+                disabled={viewOnly}
               />
             </div>
 
@@ -123,6 +131,7 @@ export default function EventModal({ isOpen, onClose, event, onSave }: EventModa
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  disabled={viewOnly}
                 >
                   <option value="academic">Academic</option>
                   <option value="cultural">Cultural</option>
@@ -141,6 +150,7 @@ export default function EventModal({ isOpen, onClose, event, onSave }: EventModa
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                   min="1"
                   required
+                  disabled={viewOnly}
                 />
               </div>
             </div>
@@ -155,6 +165,7 @@ export default function EventModal({ isOpen, onClose, event, onSave }: EventModa
                 onChange={(e) => setFormData({ ...formData, image: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                 placeholder="https://example.com/image.jpg"
+                disabled={viewOnly}
               />
             </div>
 
@@ -164,14 +175,16 @@ export default function EventModal({ isOpen, onClose, event, onSave }: EventModa
                 onClick={onClose}
                 className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
               >
-                Cancel
+                {viewOnly ? 'Close' : 'Cancel'}
               </button>
-              <button
-                type="submit"
-                className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                {event ? 'Update Event' : 'Create Event'}
-              </button>
+              {!viewOnly && (
+                <button
+                  type="submit"
+                  className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  {event ? 'Update Event' : 'Create Event'}
+                </button>
+              )}
             </div>
           </form>
         </div>
