@@ -1,13 +1,12 @@
 # CollegeConnect Deployment Guide
 
-This guide will help you deploy the CollegeConnect platform to Vercel (frontend) and Render (backend) with MongoDB Atlas.
+This guide will help you deploy the CollegeConnect platform entirely on Vercel with MongoDB Atlas.
 
 ## Prerequisites
 
 1. GitHub account
 2. Vercel account
-3. Render account
-4. MongoDB Atlas account
+3. MongoDB Atlas account
 
 ## Step 1: MongoDB Atlas Setup
 
@@ -23,29 +22,7 @@ Example connection string:
 mongodb+srv://username:password@cluster0.xxxxx.mongodb.net/collegeconnect?retryWrites=true&w=majority
 ```
 
-## Step 2: Backend Deployment on Render
-
-1. Go to [Render Dashboard](https://dashboard.render.com)
-2. Click "New" → "Web Service"
-3. Connect your GitHub repository
-4. Configure the service:
-   - **Name**: `collegeconnect-backend`
-   - **Environment**: `Node`
-   - **Build Command**: `cd backend && npm install`
-   - **Start Command**: `cd backend && npm start`
-   - **Plan**: Free
-
-5. Add Environment Variables:
-   - `NODE_ENV`: `production`
-   - `MONGODB_URI`: Your MongoDB Atlas connection string
-   - `JWT_SECRET`: Generate a strong secret (32+ characters)
-   - `CLIENT_URL`: `https://collegeconnect-frontend.vercel.app`
-   - `PORT`: `10000` (Render uses this port)
-
-6. Deploy the service
-7. Note down your backend URL (e.g., `https://collegeconnect-backend.onrender.com`)
-
-## Step 3: Frontend Deployment on Vercel
+## Step 2: Deploy on Vercel
 
 1. Go to [Vercel Dashboard](https://vercel.com/dashboard)
 2. Click "New Project"
@@ -57,52 +34,45 @@ mongodb+srv://username:password@cluster0.xxxxx.mongodb.net/collegeconnect?retryW
    - **Output Directory**: `dist`
 
 5. Add Environment Variables:
-   - `VITE_API_URL`: Your Render backend URL + `/api` (e.g., `https://college-connect-.onrender.com/api`)
+   - `MONGODB_URI`: Your MongoDB Atlas connection string
+   - `JWT_SECRET`: Generate a strong secret (32+ characters)
+   - `NODE_ENV`: `production`
+   - `CLIENT_URL`: `https://your-app-name.vercel.app` (will be set automatically)
+   - `VITE_API_URL`: `/api` (for frontend)
 
 6. Deploy the project
-7. Note down your frontend URL (e.g., `https://college-connect-black.vercel.app`)
+7. Your full-stack app will be available at your Vercel URL!
 
-## Step 4: Update CORS Settings
+## How It Works
 
-After both deployments are complete:
-
-1. Go to your Render backend service
-2. Update the `CLIENT_URL` environment variable to your actual Vercel URL
-3. Redeploy the backend
-
-## Step 5: Database Initialization
-
-1. Access your deployed backend health endpoint: `https://your-backend-url.onrender.com/api/health`
-2. If you need to initialize the database with sample data, you can run the setup scripts locally with the production MongoDB URI
+- **Frontend**: `https://your-app.vercel.app/` → Serves your React app
+- **Backend API**: `https://your-app.vercel.app/api/` → Serves your Express API
+- **File uploads**: `https://your-app.vercel.app/uploads/` → Serves uploaded files
+- **Same domain** = No CORS issues! 🎉
 
 ## Environment Variables Summary
 
-### Backend (Render)
+### Vercel Environment Variables
 ```
-NODE_ENV=production
 MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/collegeconnect?retryWrites=true&w=majority
 JWT_SECRET=your-super-secret-jwt-key-here
-CLIENT_URL=https://collegeconnect-frontend.vercel.app
-PORT=10000
-```
-
-### Frontend (Vercel)
-```
-VITE_API_URL=https://collegeconnect-backend.onrender.com/api
+NODE_ENV=production
+CLIENT_URL=https://your-app-name.vercel.app
+VITE_API_URL=/api
 ```
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **CORS Errors**: Make sure the `CLIENT_URL` in your backend matches your actual Vercel URL
-2. **Database Connection**: Verify your MongoDB Atlas connection string and IP whitelist
-3. **Build Failures**: Check the build logs in Render/Vercel for specific error messages
-4. **Environment Variables**: Ensure all required environment variables are set
+1. **Database Connection**: Verify your MongoDB Atlas connection string and IP whitelist
+2. **Build Failures**: Check the build logs in Vercel for specific error messages
+3. **Environment Variables**: Ensure all required environment variables are set
+4. **CORS Issues**: Should not occur since frontend and backend are on the same domain
 
 ### Health Checks
 
-- Backend Health: `https://your-backend-url.onrender.com/api/health`
+- Backend Health: `https://your-app-name.vercel.app/api/health`
 - Frontend: Your Vercel URL should load the application
 
 ## Local Development
@@ -123,8 +93,12 @@ And in the root directory for frontend:
 VITE_API_URL=http://localhost:5000/api
 ```
 
-## Production URLs
+## Benefits of Vercel Deployment
 
-After successful deployment, your application will be available at:
-- Frontend: `https://collegeconnect-frontend.vercel.app`
-- Backend API: `https://collegeconnect-backend.onrender.com/api`
+- ✅ **Single deployment** - Everything in one place
+- ✅ **No CORS issues** - Same domain for frontend and backend
+- ✅ **Automatic scaling** - Vercel handles serverless functions
+- ✅ **Easy management** - One dashboard for everything
+- ✅ **Free tier** - Vercel's generous free limits
+- ✅ **Automatic HTTPS** - Secure by default
+- ✅ **Global CDN** - Fast loading worldwide

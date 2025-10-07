@@ -1,6 +1,13 @@
 {
   "builds": [
     {
+      "src": "backend/package.json",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["backend/**"]
+      }
+    },
+    {
       "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
@@ -9,6 +16,14 @@
     }
   ],
   "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/backend/server.js"
+    },
+    {
+      "src": "/uploads/(.*)",
+      "dest": "/backend/uploads/$1"
+    },
     {
       "src": "/assets/(.*)",
       "dest": "/assets/$1"
@@ -23,6 +38,6 @@
     }
   ],
   "env": {
-    "VITE_API_URL": "https://college-connect-jyhg.onrender.com/api"
+    "VITE_API_URL": "/api"
   }
 }

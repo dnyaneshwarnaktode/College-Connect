@@ -26,7 +26,8 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
   'https://college-connect-black.vercel.app',
-  process.env.CLIENT_URL
+  process.env.CLIENT_URL,
+  process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null
 ].filter(Boolean);
 
 app.use(cors({
@@ -116,16 +117,23 @@ const startServer = async () => {
   });
 };
 
-startServer();
+// For Vercel deployment
+if (process.env.NODE_ENV === 'production' && process.env.VERCEL) {
+  // Export the app for Vercel serverless functions
+  module.exports = app;
+} else {
+  // Start server for local development
+  startServer();
 
-// Handle unhandled promise rejections
-process.on('unhandledRejection', (err, promise) => {
-  console.log(`Error: ${err.message}`);
-  if (server) {
-    server.close(() => {
+  // Handle unhandled promise rejections
+  process.on('unhandledRejection', (err, promise) => {
+    console.log(`Error: ${err.message}`);
+    if (server) {
+      server.close(() => {
+        process.exit(1);
+      });
+    } else {
       process.exit(1);
-    });
-  } else {
-    process.exit(1);
-  }
-});
+    }
+  });
+}
