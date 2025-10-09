@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Users, Crown, Plus, Search, Filter, Calendar, UserPlus, Eye, X, UserMinus } from 'lucide-react';
+import { Users, Crown, Plus, Search, Filter, Calendar, UserPlus, Eye, X, UserMinus, MessageCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import TeamModal from '../components/Modals/TeamModal';
 import { Team } from '../types';
@@ -8,6 +9,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 
 export default function Teams() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [teams, setTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -221,6 +223,10 @@ export default function Teams() {
     }
   };
 
+  const handleChatTeam = (teamId: string) => {
+    navigate(`/teams/${teamId}/chat`);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -335,6 +341,13 @@ export default function Teams() {
                       >
                         <Eye size={16} />
                         <span>View Details</span>
+                      </button>
+                      <button 
+                        onClick={() => handleChatTeam(team.id)}
+                        className="flex items-center space-x-1 py-2 px-3 rounded-lg transition-colors text-sm font-medium bg-green-600 hover:bg-green-700 text-white"
+                      >
+                        <MessageCircle size={16} />
+                        <span>Chat</span>
                       </button>
                       {team.leader === user?.id && (
                         <button

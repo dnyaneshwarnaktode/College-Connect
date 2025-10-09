@@ -79,3 +79,242 @@ export interface Team {
   tags: string[];
   createdAt: string;
 }
+
+export interface TeamChat {
+  id: string;
+  team: string;
+  sender: string;
+  senderName: string;
+  message: string;
+  messageType: 'text' | 'image' | 'file' | 'link';
+  attachments?: {
+    filename: string;
+    originalName: string;
+    mimetype: string;
+    size: number;
+    url: string;
+  }[];
+  replyTo?: string;
+  isEdited: boolean;
+  editedAt?: string;
+  reactions: {
+    user: string;
+    emoji: string;
+    createdAt: string;
+  }[];
+  createdAt: string;
+}
+
+export interface Challenge {
+  id: string;
+  title: string;
+  description: string;
+  category: 'dsa' | 'aptitude' | 'programming' | 'web-development' | 'mobile-development' | 'ai-ml';
+  difficulty: 'easy' | 'medium' | 'hard' | 'expert';
+  points: number;
+  timeLimit: number;
+  problemStatement: string;
+  inputFormat: string;
+  outputFormat: string;
+  constraints: string;
+  sampleInput: {
+    input: string;
+    output: string;
+    explanation: string;
+  }[];
+  hints: string[];
+  tags: string[];
+  createdBy: string;
+  createdByName: string;
+  isActive: boolean;
+  isPublished: boolean;
+  publishedAt?: string;
+  attempts: number;
+  solvedBy: number;
+  averageTime: number;
+  successRate: number;
+  createdAt: string;
+}
+
+export interface ChallengeSubmission {
+  id: string;
+  user: string;
+  challenge: string;
+  code: string;
+  language: 'javascript' | 'python' | 'java' | 'cpp' | 'c' | 'go' | 'rust' | 'typescript';
+  status: 'pending' | 'accepted' | 'wrong-answer' | 'time-limit-exceeded' | 'runtime-error' | 'compilation-error';
+  score: number;
+  timeTaken: number;
+  memoryUsed: number;
+  testResults: {
+    testCase: string;
+    passed: boolean;
+    actualOutput?: string;
+    executionTime: number;
+    memoryUsage: number;
+  }[];
+  errorMessage?: string;
+  isCorrect: boolean;
+  submittedAt: string;
+}
+
+export interface UserStats {
+  id: string;
+  user: string;
+  userName: string;
+  totalScore: number;
+  challengesSolved: number;
+  challengesAttempted: number;
+  currentStreak: number;
+  longestStreak: number;
+  lastSubmissionDate?: string;
+  streakStartDate?: string;
+  categoryStats: {
+    [key: string]: {
+      solved: number;
+      attempted: number;
+      score: number;
+    };
+  };
+  difficultyStats: {
+    [key: string]: {
+      solved: number;
+      attempted: number;
+      score: number;
+    };
+  };
+  achievements: {
+    name: string;
+    description: string;
+    icon: string;
+    unlockedAt: string;
+  }[];
+  rank: number;
+  previousRank: number;
+  rankUpdatedAt: string;
+}
+
+export interface ClassGroup {
+  id: string;
+  name: string;
+  description: string;
+  subject: string;
+  courseCode: string;
+  semester: '1st' | '2nd' | '3rd' | '4th' | '5th' | '6th' | '7th' | '8th';
+  academicYear: string;
+  teacher: string;
+  teacherName: string;
+  joinKey: string;
+  students: {
+    user: string;
+    userName: string;
+    studentId: string;
+    joinedAt: string;
+    isActive: boolean;
+  }[];
+  maxStudents: number;
+  isActive: boolean;
+  settings: {
+    allowStudentChat: boolean;
+    allowStudentPosts: boolean;
+    requireApprovalForPosts: boolean;
+    showLeaderboard: boolean;
+    allowFileSharing: boolean;
+  };
+  announcements: {
+    id: string;
+    title: string;
+    content: string;
+    createdBy: string;
+    createdByName: string;
+    priority: 'low' | 'medium' | 'high';
+    isPinned: boolean;
+    expiresAt?: string;
+    createdAt: string;
+  }[];
+  assignments: {
+    id: string;
+    title: string;
+    description: string;
+    dueDate: string;
+    maxPoints: number;
+    attachments: {
+      filename: string;
+      originalName: string;
+      url: string;
+      size: number;
+    }[];
+    submissions: {
+      student: string;
+      studentName: string;
+      submittedAt: string;
+      files: {
+        filename: string;
+        originalName: string;
+        url: string;
+        size: number;
+      }[];
+      grade?: number;
+      feedback?: string;
+      gradedAt?: string;
+      gradedBy?: string;
+    }[];
+    createdBy: string;
+    createdByName: string;
+    isActive: boolean;
+    createdAt: string;
+  }[];
+  files: {
+    id: string;
+    fileName: string;
+    originalName: string;
+    fileType: string;
+    fileSize: number;
+    fileUrl: string;
+    uploadedBy: string;
+    uploadedByName: string;
+    uploadedAt: string;
+    description: string;
+    category: 'lecture' | 'assignment' | 'resource' | 'announcement';
+  }[];
+  doubts: {
+    id: string;
+    student: string;
+    studentName: string;
+    studentId: string;
+    question: string;
+    description: string;
+    attachments: {
+      filename: string;
+      originalName: string;
+      url: string;
+      size: number;
+    }[];
+    status: 'pending' | 'answered' | 'resolved';
+    answer?: {
+      text: string;
+      answeredBy: string;
+      answeredByName: string;
+      answeredAt: string;
+      attachments: {
+        filename: string;
+        originalName: string;
+        url: string;
+        size: number;
+      }[];
+    };
+    createdAt: string;
+    updatedAt: string;
+  }[];
+  statistics: {
+    totalStudents: number;
+    activeStudents: number;
+    totalAssignments: number;
+    completedAssignments: number;
+    averageGrade: number;
+    totalFiles: number;
+    totalDoubts: number;
+    pendingDoubts: number;
+  };
+  createdAt: string;
+}

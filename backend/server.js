@@ -14,6 +14,10 @@ const forumRoutes = require('./routes/forum');
 const projectRoutes = require('./routes/projects');
 const teamRoutes = require('./routes/teams');
 const analyticsRoutes = require('./routes/analytics');
+const teamChatRoutes = require('./routes/teamChat');
+const challengeRoutes = require('./routes/challenges');
+const leaderboardRoutes = require('./routes/leaderboard');
+const classGroupRoutes = require('./routes/classGroups');
 
 // Import middleware
 const errorHandler = require('./middleware/errorHandler');
@@ -24,22 +28,42 @@ const app = express();
 // CORS configuration (must be before other middleware)
 const allowedOrigins = [
   'http://localhost:5173',
+  'http://localhost:5174',
   'http://localhost:3000',
   'https://college-connect-black.vercel.app',
   process.env.CLIENT_URL,
   process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null
 ].filter(Boolean);
 
+// Add localhost wildcard for development
+if (process.env.NODE_ENV === 'development') {
+  allowedOrigins.push(/^http:\/\/localhost:\d+$/);
+}
+
 app.use(cors({
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
+    // Log the origin for debugging
+    console.log('CORS Origin:', origin);
+    
+    // Check if origin is in allowed origins (string match)
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
-    } else {
-      return callback(new Error('Not allowed by CORS'));
     }
+    
+    // Check if origin matches any regex patterns (for localhost wildcard)
+    for (const allowedOrigin of allowedOrigins) {
+      if (allowedOrigin instanceof RegExp && allowedOrigin.test(origin)) {
+        console.log('CORS Matched regex:', allowedOrigin, 'for origin:', origin);
+        return callback(null, true);
+      }
+    }
+    
+    console.log('CORS Error - Origin not allowed:', origin);
+    console.log('Allowed origins:', allowedOrigins);
+    return callback(new Error('Not allowed by CORS'));
   },
   credentials: true
 }));
@@ -87,6 +111,10 @@ app.use('/api/forums', forumRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/teams', teamRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/teams', teamChatRoutes);
+app.use('/api/challenges', challengeRoutes);
+app.use('/api/leaderboard', leaderboardRoutes);
+app.use('/api/class-groups', classGroupRoutes);
 
 // Error handling middleware
 app.use(notFound);
@@ -105,12 +133,11 @@ const connectDB = async () => {
 
 // Start server
 const PORT = process.env.PORT || 5000;
-let server;
 
 const startServer = async () => {
   await connectDB();
-  
-  server = app.listen(PORT, () => {
+
+  app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
     console.log(`📱 Environment: ${process.env.NODE_ENV}`);
     console.log(`🌐 API Health: http://localhost:${PORT}/api/health`);

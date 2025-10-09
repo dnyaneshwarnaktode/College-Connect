@@ -14,6 +14,12 @@ import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import UserManagement from './pages/admin/UserManagement';
 import Analytics from './pages/admin/Analytics';
+// New feature pages
+import TeamChat from './pages/TeamChat';
+import Challenges from './pages/Challenges';
+import Leaderboard from './pages/Leaderboard';
+import ClassGroups from './pages/ClassGroups';
+import ClassGroupDetail from './pages/ClassGroupDetail';
 
 function AuthenticatedApp() {
   const { user } = useAuth();
@@ -36,6 +42,11 @@ function AuthenticatedApp() {
         <Route path="forums" element={<Forums />} />
         <Route path="projects" element={<Projects />} />
         <Route path="teams" element={<Teams />} />
+        <Route path="teams/:teamId/chat" element={<TeamChat />} />
+        <Route path="challenges" element={<Challenges />} />
+        <Route path="leaderboard" element={<Leaderboard />} />
+        <Route path="class-groups" element={<ClassGroups />} />
+        <Route path="class-groups/:id" element={<ClassGroupDetail />} />
         <Route path="profile" element={<Profile />} />
         <Route path="settings" element={<Settings />} />
         <Route path="admin/users" element={<UserManagement />} />
@@ -53,7 +64,6 @@ function App() {
         <Router>
           <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
             <AuthenticatedApp />
-          
           </div>
         </Router>
       </AuthProvider>
