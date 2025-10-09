@@ -18,6 +18,7 @@ const teamChatRoutes = require('./routes/teamChat');
 const challengeRoutes = require('./routes/challenges');
 const leaderboardRoutes = require('./routes/leaderboard');
 const classGroupRoutes = require('./routes/classGroups');
+const searchRoutes = require('./routes/search');
 
 // Import middleware
 const errorHandler = require('./middleware/errorHandler');
@@ -30,7 +31,7 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5174',
   'http://localhost:3000',
-  'https://college-connect-black.vercel.app',
+  'https://college-connect-site.vercel.app',
   process.env.CLIENT_URL,
   process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null
 ].filter(Boolean);
@@ -115,6 +116,7 @@ app.use('/api/teams', teamChatRoutes);
 app.use('/api/challenges', challengeRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);
 app.use('/api/class-groups', classGroupRoutes);
+app.use('/api', searchRoutes);
 
 // Error handling middleware
 app.use(notFound);

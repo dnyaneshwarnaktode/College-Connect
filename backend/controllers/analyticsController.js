@@ -4,6 +4,35 @@ const ForumPost = require('../models/ForumPost');
 const Project = require('../models/Project');
 const Team = require('../models/Team');
 
+// @desc    Get public home page statistics
+// @route   GET /api/analytics/public-stats
+// @access  Public
+const getPublicStats = async (req, res) => {
+  try {
+    // Get basic counts for home page
+    const totalUsers = await User.countDocuments({ isActive: true });
+    const totalEvents = await Event.countDocuments({ isActive: true });
+    const totalProjects = await Project.countDocuments({ isPublic: true });
+    const totalPosts = await ForumPost.countDocuments();
+
+    res.json({
+      success: true,
+      stats: {
+        totalUsers,
+        totalEvents,
+        totalProjects,
+        totalPosts
+      }
+    });
+  } catch (error) {
+    console.error('Get public stats error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+};
+
 // @desc    Get dashboard statistics
 // @route   GET /api/analytics/dashboard
 // @access  Private/Admin
@@ -631,6 +660,7 @@ const getEngagementMetrics = async (req, res) => {
 };
 
 module.exports = {
+  getPublicStats,
   getDashboardStats,
   getUserAnalytics,
   getEventAnalytics,

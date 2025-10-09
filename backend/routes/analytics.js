@@ -1,5 +1,6 @@
 const express = require('express');
 const {
+  getPublicStats,
   getDashboardStats,
   getUserAnalytics,
   getEventAnalytics,
@@ -12,7 +13,10 @@ const { protect, authorize } = require('../middleware/auth');
 
 const router = express.Router();
 
-// All routes require authentication
+// Public route (no authentication required)
+router.get('/public-stats', getPublicStats);
+
+// All other routes require authentication
 router.use(protect);
 
 // Admin only routes
