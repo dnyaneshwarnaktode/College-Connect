@@ -109,14 +109,6 @@ export default function LoginForm() {
             </p>
           </div>
 
-          <div className="mt-8 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Demo accounts:</p>
-            <div className="space-y-1 text-xs">
-              <div>Admin: admin@college.edu / admin123</div>
-              <div>Faculty: prof@college.edu / faculty123</div>
-              <div>Student: student@college.edu / student123</div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
