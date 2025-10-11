@@ -16,6 +16,7 @@ export default function Projects() {
   const [filterStatus, setFilterStatus] = useState('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | undefined>();
+  const [isViewMode, setIsViewMode] = useState(false);
 
   React.useEffect(() => {
     fetchProjects();
@@ -67,11 +68,19 @@ export default function Projects() {
 
   const handleCreateProject = () => {
     setSelectedProject(undefined);
+    setIsViewMode(false);
+    setIsModalOpen(true);
+  };
+
+  const handleViewProjectDetails = (project: Project) => {
+    setSelectedProject(project);
+    setIsViewMode(true);
     setIsModalOpen(true);
   };
 
   const handleEditProject = (project: Project) => {
     setSelectedProject(project);
+    setIsViewMode(false);
     setIsModalOpen(true);
   };
 
@@ -293,7 +302,10 @@ export default function Projects() {
                   </a>
                 )}
                 <div className="flex space-x-2 flex-1">
-                  <button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors text-sm font-medium">
+                  <button 
+                    onClick={() => handleViewProjectDetails(project)}
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors text-sm font-medium"
+                  >
                     View Details
                   </button>
                   {project.owner === user?.id && (
@@ -326,6 +338,7 @@ export default function Projects() {
         onClose={() => setIsModalOpen(false)}
         project={selectedProject}
         onSave={handleSaveProject}
+        viewOnly={isViewMode}
       />
     </div>
   );

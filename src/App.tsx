@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { SearchProvider } from './contexts/SearchContext';
 import DashboardLayout from './components/Layout/DashboardLayout';
 import LoginForm from './components/Auth/LoginForm';
 import SignupForm from './components/Auth/SignupForm';
@@ -61,11 +62,13 @@ function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <Router>
-          <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
-            <AuthenticatedApp />
-          </div>
-        </Router>
+        <SearchProvider>
+          <Router>
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
+              <AuthenticatedApp />
+            </div>
+          </Router>
+        </SearchProvider>
       </AuthProvider>
     </ThemeProvider>
   );

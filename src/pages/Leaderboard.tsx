@@ -54,30 +54,30 @@ const LeaderboardPage: React.FC<LeaderboardPageProps> = () => {
   };
 
   const getRankColor = (rank: number) => {
-    if (rank === 1) return 'text-yellow-600';
-    if (rank === 2) return 'text-gray-600';
-    if (rank === 3) return 'text-orange-600';
-    return 'text-gray-500';
+    if (rank === 1) return 'text-yellow-600 dark:text-yellow-400';
+    if (rank === 2) return 'text-gray-600 dark:text-gray-400';
+    if (rank === 3) return 'text-orange-600 dark:text-orange-400';
+    return 'text-gray-500 dark:text-gray-400';
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="flex items-center justify-center h-64 bg-gray-50 dark:bg-gray-900">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-blue-400"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <div className="bg-white shadow-sm">
+      <div className="bg-white dark:bg-gray-800 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
               🏆 Leaderboard
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
               Compete with fellow students and climb the rankings! 
               Solve challenges, maintain streaks, and showcase your programming skills.
             </p>
@@ -87,15 +87,15 @@ const LeaderboardPage: React.FC<LeaderboardPageProps> = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Tabs */}
-        <div className="bg-white rounded-lg shadow-sm mb-8">
-          <div className="border-b border-gray-200">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-8">
+          <div className="border-b border-gray-200 dark:border-gray-700">
             <nav className="-mb-px flex space-x-8 px-6">
               <button
                 onClick={() => setActiveTab('overall')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'overall'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
                 }`}
               >
                 Overall Ranking
@@ -104,8 +104,8 @@ const LeaderboardPage: React.FC<LeaderboardPageProps> = () => {
                 onClick={() => setActiveTab('category')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'category'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
                 }`}
               >
                 Category Wise
@@ -114,8 +114,8 @@ const LeaderboardPage: React.FC<LeaderboardPageProps> = () => {
                 onClick={() => setActiveTab('streaks')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'streaks'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
                 }`}
               >
                 Streak Leaders
@@ -125,17 +125,17 @@ const LeaderboardPage: React.FC<LeaderboardPageProps> = () => {
 
           {/* Timeframe Filter */}
           {activeTab === 'overall' && (
-            <div className="px-6 py-4 border-b border-gray-200">
+            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
               <div className="flex space-x-4">
-                <span className="text-sm font-medium text-gray-700">Timeframe:</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Timeframe:</span>
                 {['all', 'week', 'month'].map((period) => (
                   <button
                     key={period}
                     onClick={() => setTimeframe(period)}
                     className={`px-3 py-1 rounded-full text-sm font-medium ${
                       timeframe === period
-                        ? 'bg-blue-100 text-blue-800'
-                        : 'text-gray-500 hover:text-gray-700'
+                        ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                     }`}
                   >
                     {period === 'all' ? 'All Time' : period === 'week' ? 'This Week' : 'This Month'}
@@ -147,42 +147,42 @@ const LeaderboardPage: React.FC<LeaderboardPageProps> = () => {
         </div>
 
         {/* Leaderboard Table */}
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead className="bg-gray-50 dark:bg-gray-700">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     Rank
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     Student
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     Score
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     Solved
                   </th>
                   {activeTab === 'streaks' ? (
                     <>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Current Streak
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Longest Streak
                       </th>
                     </>
                   ) : (
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Department
                     </th>
                   )}
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                 {leaderboard.map((user, index) => (
-                  <tr key={user.id} className="hover:bg-gray-50">
+                  <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className={`text-lg font-bold ${getRankColor(user.rank)}`}>
                         {getRankIcon(user.rank)}
@@ -191,32 +191,32 @@ const LeaderboardPage: React.FC<LeaderboardPageProps> = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10">
-                          <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                            <span className="text-sm font-medium text-blue-600">
+                          <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                            <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
                               {user.userName?.charAt(0).toUpperCase()}
                             </span>
                           </div>
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">
                             {user.userName}
                           </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-gray-500 dark:text-gray-400">
                             {user.user?.year ? `Year ${user.user.year}` : 'Faculty'}
                           </div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-semibold text-blue-600">
+                      <div className="text-sm font-semibold text-blue-600 dark:text-blue-400">
                         {user.totalScore.toLocaleString()}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
+                      <div className="text-sm text-gray-900 dark:text-white">
                         {user.challengesSolved}
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
                         {user.challengesAttempted} attempted
                       </div>
                     </td>
@@ -224,23 +224,23 @@ const LeaderboardPage: React.FC<LeaderboardPageProps> = () => {
                       <>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
-                            <span className="text-sm font-semibold text-orange-600">
+                            <span className="text-sm font-semibold text-orange-600 dark:text-orange-400">
                               {user.currentStreak}
                             </span>
-                            <span className="ml-1 text-xs text-gray-500">days</span>
+                            <span className="ml-1 text-xs text-gray-500 dark:text-gray-400">days</span>
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
-                            <span className="text-sm font-semibold text-purple-600">
+                            <span className="text-sm font-semibold text-purple-600 dark:text-purple-400">
                               {user.longestStreak}
                             </span>
-                            <span className="ml-1 text-xs text-gray-500">days</span>
+                            <span className="ml-1 text-xs text-gray-500 dark:text-gray-400">days</span>
                           </div>
                         </td>
                       </>
                     ) : (
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                         {user.user?.department || 'N/A'}
                       </td>
                     )}
@@ -258,7 +258,7 @@ const LeaderboardPage: React.FC<LeaderboardPageProps> = () => {
               <button
                 onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                 disabled={currentPage === 1}
-                className="px-3 py-2 border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
               >
                 Previous
               </button>
@@ -272,7 +272,7 @@ const LeaderboardPage: React.FC<LeaderboardPageProps> = () => {
                     className={`px-3 py-2 border rounded-md ${
                       page === currentPage
                         ? 'bg-blue-600 text-white border-blue-600'
-                        : 'border-gray-300 hover:bg-gray-50'
+                        : 'border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300'
                     }`}
                   >
                     {page}
@@ -283,7 +283,7 @@ const LeaderboardPage: React.FC<LeaderboardPageProps> = () => {
               <button
                 onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                 disabled={currentPage === totalPages}
-                className="px-3 py-2 border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
               >
                 Next
               </button>

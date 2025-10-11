@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { Calendar, Users, MessageSquare, FolderOpen, TrendingUp, Sparkles, ArrowRight, BookOpen, Trophy, Zap } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import Squares from '../components/Squares';
@@ -6,6 +7,44 @@ import Squares from '../components/Squares';
 export default function Home() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalEvents: 0,
+    totalProjects: 0,
+    totalPosts: 0
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+  useEffect(() => {
+    fetchStats();
+    
+    // Refresh stats every 5 minutes
+    const interval = setInterval(fetchStats, 5 * 60 * 1000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_BASE_URL}/analytics/public-stats`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setStats(data.stats);
+      } else {
+        setError('Failed to load statistics');
+      }
+    } catch (err) {
+      console.error('Error fetching stats:', err);
+      setError('Failed to load statistics');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const features = [
     {
@@ -38,11 +77,11 @@ export default function Home() {
     }
   ];
 
-  const stats = [
-    { label: 'Active Students', value: '1,200+', icon: Users, color: 'text-emerald-500' },
-    { label: 'Events Hosted', value: '250+', icon: Calendar, color: 'text-violet-500' },
-    { label: 'Projects Created', value: '380+', icon: FolderOpen, color: 'text-rose-500' },
-    { label: 'Forum Discussions', value: '1,500+', icon: MessageSquare, color: 'text-amber-500' }
+  const statsData = [
+    { label: 'Active Students', value: loading ? '...' : `${stats.totalUsers.toLocaleString()}+`, icon: Users, color: 'text-emerald-500' },
+    { label: 'Events Hosted', value: loading ? '...' : `${stats.totalEvents.toLocaleString()}+`, icon: Calendar, color: 'text-violet-500' },
+    { label: 'Projects Created', value: loading ? '...' : `${stats.totalProjects.toLocaleString()}+`, icon: FolderOpen, color: 'text-rose-500' },
+    { label: 'Forum Discussions', value: loading ? '...' : `${stats.totalPosts.toLocaleString()}+`, icon: MessageSquare, color: 'text-amber-500' }
   ];
 
   const quickActions = [
@@ -106,8 +145,19 @@ export default function Home() {
 
         {/* Stats Section */}
         <div className="container mx-auto px-4">
+          {error && (
+            <div className="mb-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg text-red-300 text-center">
+              {error}
+              <button 
+                onClick={fetchStats}
+                className="ml-2 underline hover:text-red-200"
+              >
+                Retry
+              </button>
+            </div>
+          )}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-            {stats.map((stat, index) => (
+            {statsData.map((stat, index) => (
               <div 
                 key={index}
                 className="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105"
@@ -116,7 +166,7 @@ export default function Home() {
                   <stat.icon className={`w-6 h-6 mb-2 ${stat.color}`} />
                   <div className="text-xl md:text-2xl font-bold text-white mb-1 flex items-center">
                     {stat.value}
-                    <TrendingUp className="w-4 h-4 ml-1 text-green-400" />
+                    {!loading && <TrendingUp className="w-4 h-4 ml-1 text-green-400" />}
                   </div>
                   <div className="text-xs text-gray-300">{stat.label}</div>
                 </div>

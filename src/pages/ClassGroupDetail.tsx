@@ -320,28 +320,28 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'pending': return 'text-yellow-600 bg-yellow-100';
-      case 'answered': return 'text-green-600 bg-green-100';
-      case 'resolved': return 'text-blue-600 bg-blue-100';
-      default: return 'text-gray-600 bg-gray-100';
+      case 'pending': return 'text-yellow-600 bg-yellow-100 dark:text-yellow-400 dark:bg-yellow-900/30';
+      case 'answered': return 'text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/30';
+      case 'resolved': return 'text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30';
+      default: return 'text-gray-600 bg-gray-100 dark:text-gray-400 dark:bg-gray-800';
     }
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="flex items-center justify-center h-64 bg-gray-50 dark:bg-gray-900">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-blue-400"></div>
       </div>
     );
   }
 
   if (!classGroup) {
     return (
-      <div className="text-center py-12">
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">Class Group Not Found</h3>
+      <div className="text-center py-12 bg-gray-50 dark:bg-gray-900 min-h-screen">
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Class Group Not Found</h3>
         <button
           onClick={() => navigate('/class-groups')}
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+          className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-6 py-3 rounded-lg transition-colors"
         >
           Back to Class Groups
         </button>
@@ -360,24 +360,24 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Notifications */}
       <div className="fixed top-4 right-4 z-50 space-y-2">
         {notifications.map((notification) => (
           <div
             key={notification.id}
-            className={`p-4 rounded-lg shadow-lg max-w-sm ${
-              notification.type === 'success' ? 'bg-green-100 border border-green-300 text-green-800' :
-              notification.type === 'info' ? 'bg-blue-100 border border-blue-300 text-blue-800' :
-              notification.type === 'warning' ? 'bg-yellow-100 border border-yellow-300 text-yellow-800' :
-              'bg-red-100 border border-red-300 text-red-800'
+            className={`p-4 rounded-lg shadow-lg max-w-sm border ${
+              notification.type === 'success' ? 'bg-green-100 dark:bg-green-900/30 border-green-300 dark:border-green-700 text-green-800 dark:text-green-200' :
+              notification.type === 'info' ? 'bg-blue-100 dark:bg-blue-900/30 border-blue-300 dark:border-blue-700 text-blue-800 dark:text-blue-200' :
+              notification.type === 'warning' ? 'bg-yellow-100 dark:bg-yellow-900/30 border-yellow-300 dark:border-yellow-700 text-yellow-800 dark:text-yellow-200' :
+              'bg-red-100 dark:bg-red-900/30 border-red-300 dark:border-red-700 text-red-800 dark:text-red-200'
             }`}
           >
             <div className="flex justify-between items-start">
               <p className="text-sm">{notification.message}</p>
               <button
                 onClick={() => removeNotification(notification.id)}
-                className="ml-2 text-lg leading-none"
+                className="ml-2 text-lg leading-none hover:opacity-70"
               >
                 ×
               </button>
@@ -387,27 +387,27 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
       </div>
 
       {/* Header */}
-      <div className="bg-white shadow-sm">
+      <div className="bg-white dark:bg-gray-800 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex justify-between items-start">
             <div>
               <button
                 onClick={() => navigate('/class-groups')}
-                className="text-blue-600 hover:text-blue-700 mb-4 flex items-center"
+                className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 mb-4 flex items-center"
               >
                 ← Back to Class Groups
               </button>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
                 {classGroup.name}
               </h1>
-              <p className="text-gray-600 mb-2">
+              <p className="text-gray-600 dark:text-gray-300 mb-2">
                 {classGroup.subject} - {classGroup.courseCode} | {classGroup.semester} Semester
               </p>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 Academic Year: {classGroup.academicYear}
                 {isTeacher && (
                   <span className="ml-2">
-                    | Join Key: <span className="font-mono bg-gray-100 px-2 py-1 rounded">{classGroup.joinKey}</span>
+                    | Join Key: <span className="font-mono bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white px-2 py-1 rounded">{classGroup.joinKey}</span>
                   </span>
                 )}
               </p>
@@ -418,19 +418,19 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
                 <>
                   <button
                     onClick={() => setShowShareModal(true)}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                    className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
                   >
                     📤 Share Class
                   </button>
                   <button
                     onClick={() => setShowFileUpload(true)}
-                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                    className="bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
                   >
                     Upload File
                   </button>
                   <button
                     onClick={() => setShowAssignmentForm(true)}
-                    className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+                    className="bg-purple-600 hover:bg-purple-700 dark:bg-purple-500 dark:hover:bg-purple-600 text-white px-4 py-2 rounded-lg transition-colors"
                   >
                     Create Assignment
                   </button>
@@ -440,7 +440,7 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
               {isStudent && (
                 <button
                   onClick={() => setShowDoubtForm(true)}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                  className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
                 >
                   Ask Doubt
                 </button>
@@ -452,8 +452,8 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Tabs */}
-        <div className="bg-white rounded-lg shadow-sm mb-6">
-          <div className="border-b border-gray-200">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
+          <div className="border-b border-gray-200 dark:border-gray-700">
             <nav className="-mb-px flex space-x-8 px-6">
               {[
                 { id: 'overview', label: 'Overview', icon: '📊' },
@@ -466,8 +466,8 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
                   onClick={() => setActiveTab(tab.id as any)}
                   className={`py-4 px-1 border-b-2 font-medium text-sm ${
                     activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                      : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
                   }`}
                 >
                   <span className="mr-2">{tab.icon}</span>
@@ -479,37 +479,37 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
         </div>
 
         {/* Tab Content */}
-        <div className="bg-white rounded-lg shadow-sm">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
           {activeTab === 'overview' && (
             <div className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <div className="text-2xl font-bold text-blue-600">{classGroup.statistics.activeStudents}</div>
-                  <div className="text-sm text-gray-600">Active Students</div>
+                <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg">
+                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{classGroup.statistics.activeStudents}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-300">Active Students</div>
                 </div>
-                <div className="bg-green-50 p-4 rounded-lg">
-                  <div className="text-2xl font-bold text-green-600">{classGroup.statistics.totalFiles}</div>
-                  <div className="text-sm text-gray-600">Files Uploaded</div>
+                <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg">
+                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">{classGroup.statistics.totalFiles}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-300">Files Uploaded</div>
                 </div>
-                <div className="bg-yellow-50 p-4 rounded-lg">
-                  <div className="text-2xl font-bold text-yellow-600">{classGroup.statistics.pendingDoubts}</div>
-                  <div className="text-sm text-gray-600">Pending Doubts</div>
+                <div className="bg-yellow-50 dark:bg-yellow-900/30 p-4 rounded-lg">
+                  <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{classGroup.statistics.pendingDoubts}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-300">Pending Doubts</div>
                 </div>
               </div>
 
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Description</h3>
-                <p className="text-gray-600">{classGroup.description}</p>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Description</h3>
+                <p className="text-gray-600 dark:text-gray-300">{classGroup.description}</p>
               </div>
 
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Students</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Students</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {classGroup.students.map((student) => (
-                    <div key={student.user} className="bg-gray-50 p-4 rounded-lg">
-                      <div className="font-medium text-gray-900">{student.userName}</div>
-                      <div className="text-sm text-gray-600">ID: {student.studentId}</div>
-                      <div className="text-sm text-gray-500">
+                    <div key={student.user} className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                      <div className="font-medium text-gray-900 dark:text-white">{student.userName}</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-300">ID: {student.studentId}</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">
                         Joined: {new Date(student.joinedAt).toLocaleDateString()}
                       </div>
                     </div>
@@ -522,11 +522,11 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
           {activeTab === 'files' && (
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-semibold text-gray-900">Files & Resources</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Files & Resources</h3>
                 {isTeacher && (
                   <button
                     onClick={() => setShowFileUpload(true)}
-                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                    className="bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
                   >
                     Upload File
                   </button>
@@ -536,38 +536,38 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
               {classGroup.files.length === 0 ? (
                 <div className="text-center py-12">
                   <div className="text-6xl mb-4">📁</div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No Files Yet</h3>
-                  <p className="text-gray-600">
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No Files Yet</h3>
+                  <p className="text-gray-600 dark:text-gray-300">
                     {isTeacher ? 'Upload your first file to get started' : 'No files have been uploaded yet'}
                   </p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {classGroup.files.map((file) => (
-                    <div key={file.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div key={file.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow bg-white dark:bg-gray-800">
                       <div className="flex items-start justify-between mb-2">
-                        <div className="font-medium text-gray-900 truncate">{file.originalName}</div>
+                        <div className="font-medium text-gray-900 dark:text-white truncate">{file.originalName}</div>
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          file.category === 'lecture' ? 'bg-blue-100 text-blue-600' :
-                          file.category === 'assignment' ? 'bg-green-100 text-green-600' :
-                          file.category === 'announcement' ? 'bg-yellow-100 text-yellow-600' :
-                          'bg-gray-100 text-gray-600'
+                          file.category === 'lecture' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' :
+                          file.category === 'assignment' ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400' :
+                          file.category === 'announcement' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400' :
+                          'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
                         }`}>
                           {file.category}
                         </span>
                       </div>
-                      <div className="text-sm text-gray-600 mb-2">
+                      <div className="text-sm text-gray-600 dark:text-gray-300 mb-2">
                         {formatFileSize(file.fileSize)} • {file.fileType}
                       </div>
                       {file.description && (
-                        <div className="text-sm text-gray-500 mb-2">{file.description}</div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400 mb-2">{file.description}</div>
                       )}
-                      <div className="text-xs text-gray-400 mb-3">
+                      <div className="text-xs text-gray-400 dark:text-gray-500 mb-3">
                         Uploaded by {file.uploadedByName} on {new Date(file.uploadedAt).toLocaleDateString()}
                       </div>
                       <button
                         onClick={() => handleDownloadFile(file.fileUrl, file.originalName)}
-                        className="w-full bg-blue-600 text-white px-3 py-2 rounded text-sm hover:bg-blue-700 transition-colors"
+                        className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-3 py-2 rounded text-sm transition-colors"
                       >
                         📥 Download
                       </button>
@@ -581,11 +581,11 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
           {activeTab === 'doubts' && (
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-semibold text-gray-900">Doubts & Questions</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Doubts & Questions</h3>
                 {isStudent && (
                   <button
                     onClick={() => setShowDoubtForm(true)}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                    className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
                   >
                     Ask Doubt
                   </button>
@@ -595,19 +595,19 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
               {classGroup.doubts.length === 0 ? (
                 <div className="text-center py-12">
                   <div className="text-6xl mb-4">❓</div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No Doubts Yet</h3>
-                  <p className="text-gray-600">
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No Doubts Yet</h3>
+                  <p className="text-gray-600 dark:text-gray-300">
                     {isStudent ? 'Ask your first question to get help' : 'No questions have been asked yet'}
                   </p>
                 </div>
               ) : (
                 <div className="space-y-4">
                   {classGroup.doubts.map((doubt) => (
-                    <div key={doubt.id} className="border border-gray-200 rounded-lg p-4">
+                    <div key={doubt.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800">
                       <div className="flex items-start justify-between mb-3">
                         <div>
-                          <div className="font-medium text-gray-900">{doubt.question}</div>
-                          <div className="text-sm text-gray-600">
+                          <div className="font-medium text-gray-900 dark:text-white">{doubt.question}</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-300">
                             Asked by {doubt.studentName} ({doubt.studentId})
                           </div>
                         </div>
@@ -617,21 +617,21 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
                       </div>
                       
                       {doubt.description && (
-                        <div className="text-gray-600 mb-3">{doubt.description}</div>
+                        <div className="text-gray-600 dark:text-gray-300 mb-3">{doubt.description}</div>
                       )}
                       
                       {doubt.answer && (
-                        <div className="bg-green-50 border-l-4 border-green-400 p-4 mb-3">
-                          <div className="font-medium text-green-800 mb-2">Answer:</div>
-                          <div className="text-green-700">{doubt.answer.text}</div>
-                          <div className="text-sm text-green-600 mt-2">
+                        <div className="bg-green-50 dark:bg-green-900/30 border-l-4 border-green-400 dark:border-green-500 p-4 mb-3">
+                          <div className="font-medium text-green-800 dark:text-green-200 mb-2">Answer:</div>
+                          <div className="text-green-700 dark:text-green-300">{doubt.answer.text}</div>
+                          <div className="text-sm text-green-600 dark:text-green-400 mt-2">
                             Answered by {doubt.answer.answeredByName} on {new Date(doubt.answer.answeredAt).toLocaleDateString()}
                           </div>
                         </div>
                       )}
                       
                       <div className="flex justify-between items-center mt-3">
-                        <div className="text-xs text-gray-400">
+                        <div className="text-xs text-gray-400 dark:text-gray-500">
                           Asked on {new Date(doubt.createdAt).toLocaleDateString()}
                         </div>
                         {isTeacher && doubt.status === 'pending' && (
@@ -640,7 +640,7 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
                               setSelectedDoubt(doubt.id);
                               setShowAnswerForm(true);
                             }}
-                            className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition-colors"
+                            className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-colors"
                           >
                             Answer
                           </button>
@@ -656,11 +656,11 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
           {activeTab === 'assignments' && (
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-semibold text-gray-900">Assignments</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Assignments</h3>
                 {isTeacher && (
                   <button 
                     onClick={() => setShowAssignmentForm(true)}
-                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                    className="bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
                   >
                     Create Assignment
                   </button>
@@ -670,33 +670,33 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
               {classGroup.assignments.length === 0 ? (
                 <div className="text-center py-12">
                   <div className="text-6xl mb-4">📝</div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No Assignments Yet</h3>
-                  <p className="text-gray-600">
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No Assignments Yet</h3>
+                  <p className="text-gray-600 dark:text-gray-300">
                     {isTeacher ? 'Create your first assignment' : 'No assignments have been posted yet'}
                   </p>
                 </div>
               ) : (
                 <div className="space-y-4">
                   {classGroup.assignments.map((assignment) => (
-                    <div key={assignment.id} className="border border-gray-200 rounded-lg p-4">
+                    <div key={assignment.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800">
                       <div className="flex items-start justify-between mb-3">
                         <div>
-                          <div className="font-medium text-gray-900">{assignment.title}</div>
-                          <div className="text-sm text-gray-600">
+                          <div className="font-medium text-gray-900 dark:text-white">{assignment.title}</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-300">
                             Due: {new Date(assignment.dueDate).toLocaleDateString()}
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="font-medium text-gray-900">{assignment.maxPoints} points</div>
-                          <div className="text-sm text-gray-600">
+                          <div className="font-medium text-gray-900 dark:text-white">{assignment.maxPoints} points</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-300">
                             {assignment.submissions.length} submissions
                           </div>
                         </div>
                       </div>
                       
-                      <div className="text-gray-600 mb-3">{assignment.description}</div>
+                      <div className="text-gray-600 dark:text-gray-300 mb-3">{assignment.description}</div>
                       
-                      <div className="text-xs text-gray-400">
+                      <div className="text-xs text-gray-400 dark:text-gray-500">
                         Created by {assignment.createdByName} on {new Date(assignment.createdAt).toLocaleDateString()}
                       </div>
                     </div>
@@ -711,30 +711,30 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
       {/* File Upload Modal */}
       {showFileUpload && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Upload File</h3>
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4 border border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Upload File</h3>
             
             <form onSubmit={handleFileUpload} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Select File
                 </label>
                 <input
                   type="file"
                   onChange={(e) => setFileForm(prev => ({ ...prev, file: e.target.files?.[0] || null }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Category
                 </label>
                 <select
                   value={fileForm.category}
                   onChange={(e) => setFileForm(prev => ({ ...prev, category: e.target.value as any }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
                   <option value="resource">Resource</option>
                   <option value="lecture">Lecture</option>
@@ -744,7 +744,7 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Description
                 </label>
                 <textarea
@@ -752,7 +752,7 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
                   onChange={(e) => setFileForm(prev => ({ ...prev, description: e.target.value }))}
                   placeholder="Optional description..."
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                 />
               </div>
 
@@ -760,14 +760,14 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
                 <button
                   type="button"
                   onClick={() => setShowFileUpload(false)}
-                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors bg-white dark:bg-gray-800"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={!fileForm.file || uploading}
-                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {uploading ? 'Uploading...' : 'Upload File'}
                 </button>
@@ -780,12 +780,12 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
       {/* Doubt Form Modal */}
       {showDoubtForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Ask a Doubt</h3>
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4 border border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Ask a Doubt</h3>
             
             <form onSubmit={handleDoubtSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Student ID
                 </label>
                 <input
@@ -793,12 +793,12 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
                   value={doubtForm.studentId}
                   onChange={(e) => setDoubtForm(prev => ({ ...prev, studentId: e.target.value }))}
                   placeholder="Enter your student ID"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Question *
                 </label>
                 <input
@@ -806,13 +806,13 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
                   value={doubtForm.question}
                   onChange={(e) => setDoubtForm(prev => ({ ...prev, question: e.target.value }))}
                   placeholder="What's your question?"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Description
                 </label>
                 <textarea
@@ -820,7 +820,7 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
                   onChange={(e) => setDoubtForm(prev => ({ ...prev, description: e.target.value }))}
                   placeholder="Provide more details..."
                   rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                 />
               </div>
 
@@ -828,14 +828,14 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
                 <button
                   type="button"
                   onClick={() => setShowDoubtForm(false)}
-                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors bg-white dark:bg-gray-800"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={!doubtForm.question.trim() || submittingDoubt}
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {submittingDoubt ? 'Submitting...' : 'Submit Doubt'}
                 </button>
@@ -848,12 +848,12 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
       {/* Create Assignment Modal */}
       {showAssignmentForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Create Assignment</h3>
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto border border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Create Assignment</h3>
             
             <form onSubmit={handleCreateAssignment} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Assignment Title *
                 </label>
                 <input
@@ -861,13 +861,13 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
                   value={assignmentForm.title}
                   onChange={(e) => setAssignmentForm(prev => ({ ...prev, title: e.target.value }))}
                   placeholder="Enter assignment title"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Description *
                 </label>
                 <textarea
@@ -875,27 +875,27 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
                   onChange={(e) => setAssignmentForm(prev => ({ ...prev, description: e.target.value }))}
                   placeholder="Describe the assignment requirements..."
                   rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                   required
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Due Date *
                   </label>
                   <input
                     type="datetime-local"
                     value={assignmentForm.dueDate}
                     onChange={(e) => setAssignmentForm(prev => ({ ...prev, dueDate: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Max Points
                   </label>
                   <input
@@ -904,7 +904,7 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
                     onChange={(e) => setAssignmentForm(prev => ({ ...prev, maxPoints: parseInt(e.target.value) || 100 }))}
                     min="1"
                     max="1000"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
               </div>
@@ -913,14 +913,14 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
                 <button
                   type="button"
                   onClick={() => setShowAssignmentForm(false)}
-                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors bg-white dark:bg-gray-800"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={creatingAssignment}
-                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {creatingAssignment ? 'Creating...' : 'Create Assignment'}
                 </button>
@@ -933,12 +933,12 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
       {/* Answer Doubt Modal */}
       {showAnswerForm && selectedDoubt && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Answer Doubt</h3>
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4 border border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Answer Doubt</h3>
             
             <form onSubmit={handleAnswerDoubt} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Your Answer *
                 </label>
                 <textarea
@@ -946,7 +946,7 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
                   onChange={(e) => setAnswerForm(prev => ({ ...prev, answer: e.target.value }))}
                   placeholder="Provide a detailed answer..."
                   rows={6}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                   required
                 />
               </div>
@@ -959,14 +959,14 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
                     setSelectedDoubt(null);
                     setAnswerForm({ answer: '' });
                   }}
-                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors bg-white dark:bg-gray-800"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={!answerForm.answer.trim() || answeringDoubt}
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {answeringDoubt ? 'Answering...' : 'Submit Answer'}
                 </button>
@@ -979,25 +979,25 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
       {/* Share Class Modal */}
       {showShareModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Share Class</h3>
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4 border border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Share Class</h3>
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Class Name
                 </label>
-                <div className="p-3 bg-gray-50 rounded-md text-gray-900">
+                <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-md text-gray-900 dark:text-white">
                   {classGroup?.name}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Join Key
                 </label>
                 <div className="flex items-center space-x-2">
-                  <div className="flex-1 p-3 bg-gray-50 rounded-md font-mono text-lg text-center">
+                  <div className="flex-1 p-3 bg-gray-50 dark:bg-gray-700 rounded-md font-mono text-lg text-center text-gray-900 dark:text-white">
                     {classGroup?.joinKey}
                   </div>
                   <button
@@ -1005,16 +1005,16 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
                       navigator.clipboard.writeText(classGroup?.joinKey || '');
                       alert('Join key copied to clipboard!');
                     }}
-                    className="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                    className="px-3 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded-md transition-colors"
                   >
                     Copy
                   </button>
                 </div>
               </div>
 
-              <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-                <h4 className="font-medium text-blue-900 mb-2">How to share:</h4>
-                <ol className="text-sm text-blue-800 space-y-1">
+              <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-md p-4">
+                <h4 className="font-medium text-blue-900 dark:text-blue-200 mb-2">How to share:</h4>
+                <ol className="text-sm text-blue-800 dark:text-blue-300 space-y-1">
                   <li>1. Share the join key with your students</li>
                   <li>2. Students can join using the "Join Class" button</li>
                   <li>3. They'll need to enter this join key</li>
@@ -1025,7 +1025,7 @@ const ClassGroupDetailPage: React.FC<ClassGroupDetailPageProps> = () => {
             <div className="flex justify-end mt-6">
               <button
                 onClick={() => setShowShareModal(false)}
-                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 dark:bg-gray-500 dark:hover:bg-gray-600 text-white rounded-md transition-colors"
               >
                 Close
               </button>

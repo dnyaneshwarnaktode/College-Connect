@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { Bell, Search, Menu, X, Calendar, MessageSquare, FolderOpen, Users, Clock } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useSearch } from '../../contexts/SearchContext';
+import SearchModal from '../SearchModal';
 
 interface NavbarProps {
   sidebarOpen: boolean;
@@ -21,9 +23,14 @@ interface Notification {
 export default function Navbar({ sidebarOpen, setSidebarOpen }: NavbarProps) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { searchQuery, setSearchQuery, performSearch, clearSearch } = useSearch();
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [searchModalOpen, setSearchModalOpen] = useState(false);
+  const [searchInputFocused, setSearchInputFocused] = useState(false);
   const notificationsRef = useRef<HTMLDivElement>(null);
-  const [notifications] = useState<Notification[]>([
+  const searchRef = useRef<HTMLDivElement>(null);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [notifications, setNotifications] = useState<Notification[]>([
     {
       id: '1',
       type: 'event',
@@ -77,16 +84,79 @@ export default function Navbar({ sidebarOpen, setSidebarOpen }: NavbarProps) {
       if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
         setNotificationsOpen(false);
       }
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setSearchInputFocused(false);
+      }
     };
 
-    if (notificationsOpen) {
+    if (notificationsOpen || searchInputFocused) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [notificationsOpen]);
+  }, [notificationsOpen, searchInputFocused]);
+
+  // Handle search input changes with debouncing
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+
+    // Clear previous timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    // Set new timeout for debounced search
+    if (query.trim()) {
+      searchTimeoutRef.current = setTimeout(() => {
+        performSearch(query);
+      }, 300);
+    } else {
+      clearSearch();
+    }
+  };
+
+  // Handle search input key events
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && searchQuery.trim()) {
+      e.preventDefault();
+      setSearchModalOpen(true);
+    }
+    if (e.key === 'Escape') {
+      setSearchInputFocused(false);
+      clearSearch();
+    }
+  };
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const markAllAsRead = () => {
+    setNotifications(prevNotifications => 
+      prevNotifications.map(notification => ({
+        ...notification,
+        isRead: true
+      }))
+    );
+  };
+
+  const markNotificationAsRead = (notificationId: string) => {
+    setNotifications(prevNotifications => 
+      prevNotifications.map(notification => 
+        notification.id === notificationId 
+          ? { ...notification, isRead: true }
+          : notification
+      )
+    );
+  };
 
   return (
     <header className="sticky top-0 z-40 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
@@ -100,18 +170,41 @@ export default function Navbar({ sidebarOpen, setSidebarOpen }: NavbarProps) {
           </button>
           
           <div className="hidden md:block">
-            <div className="relative">
-              <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <div className="relative" ref={searchRef}>
+              <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" />
               <input
                 type="text"
-                placeholder="Search..."
-                className="pl-10 pr-4 py-2 w-64 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                placeholder="Search events, projects, forums..."
+                value={searchQuery}
+                onChange={handleSearchChange}
+                onKeyDown={handleSearchKeyDown}
+                onFocus={() => setSearchInputFocused(true)}
+                className="pl-10 pr-4 py-2 w-64 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
               />
+              {searchQuery && (
+                <button
+                  onClick={() => {
+                    setSearchQuery('');
+                    clearSearch();
+                  }}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                  <X size={16} />
+                </button>
+              )}
             </div>
           </div>
         </div>
 
         <div className="flex items-center space-x-3">
+          {/* Mobile Search Button */}
+          <button
+            onClick={() => setSearchModalOpen(true)}
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors md:hidden"
+          >
+            <Search size={20} />
+          </button>
+
           {/* Notifications Dropdown */}
           <div className="relative" ref={notificationsRef}>
             <button 
@@ -155,8 +248,11 @@ export default function Navbar({ sidebarOpen, setSidebarOpen }: NavbarProps) {
                           !notification.isRead ? 'bg-blue-50 dark:bg-blue-900/20' : ''
                         }`}
                         onClick={() => {
+                          if (!notification.isRead) {
+                            markNotificationAsRead(notification.id);
+                          }
                           if (notification.actionUrl) {
-                            window.location.href = notification.actionUrl;
+                            navigate(notification.actionUrl);
                           }
                           setNotificationsOpen(false);
                         }}
@@ -192,9 +288,12 @@ export default function Navbar({ sidebarOpen, setSidebarOpen }: NavbarProps) {
                   )}
                 </div>
                 
-                {notifications.length > 0 && (
+                {notifications.filter(n => !n.isRead).length > 0 && (
                   <div className="p-3 border-t border-gray-200 dark:border-gray-700">
-                    <button className="w-full text-center text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
+                    <button 
+                      onClick={markAllAsRead}
+                      className="w-full text-center text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+                    >
                       Mark all as read
                     </button>
                   </div>
@@ -224,6 +323,12 @@ export default function Navbar({ sidebarOpen, setSidebarOpen }: NavbarProps) {
           </button>
         </div>
       </div>
+
+      {/* Search Modal */}
+      <SearchModal 
+        isOpen={searchModalOpen} 
+        onClose={() => setSearchModalOpen(false)} 
+      />
     </header>
   );
 }

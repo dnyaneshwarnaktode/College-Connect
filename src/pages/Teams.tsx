@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
 import { Users, Crown, Plus, Search, Filter, Calendar, UserPlus, Eye, X, UserMinus, MessageCircle } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import TeamModal from '../components/Modals/TeamModal';
+import TeamChatModal from '../components/Modals/TeamChatModal';
 import { Team } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 export default function Teams() {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [teams, setTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -19,6 +18,8 @@ export default function Teams() {
   const [selectedTeam, setSelectedTeam] = useState<Team | undefined>();
   const [joinedTeams, setJoinedTeams] = useState<string[]>([]);
   const [viewingTeam, setViewingTeam] = useState<Team | null>(null);
+  const [isChatModalOpen, setIsChatModalOpen] = useState(false);
+  const [chatTeam, setChatTeam] = useState<Team | null>(null);
 
   React.useEffect(() => {
     fetchTeams();
@@ -167,7 +168,7 @@ export default function Teams() {
         throw new Error(errorData.message || 'Failed to join team');
       }
       
-      const result = await response.json();
+      await response.json();
       
       // Add to joined teams list
       setJoinedTeams(prev => [...prev, teamId]);
@@ -223,8 +224,9 @@ export default function Teams() {
     }
   };
 
-  const handleChatTeam = (teamId: string) => {
-    navigate(`/teams/${teamId}/chat`);
+  const handleChatTeam = (team: Team) => {
+    setChatTeam(team);
+    setIsChatModalOpen(true);
   };
 
   return (
@@ -343,7 +345,7 @@ export default function Teams() {
                         <span>View Details</span>
                       </button>
                       <button 
-                        onClick={() => handleChatTeam(team.id)}
+                        onClick={() => handleChatTeam(team)}
                         className="flex items-center space-x-1 py-2 px-3 rounded-lg transition-colors text-sm font-medium bg-green-600 hover:bg-green-700 text-white"
                       >
                         <MessageCircle size={16} />
@@ -671,6 +673,12 @@ export default function Teams() {
         onClose={() => setIsModalOpen(false)}
         team={selectedTeam}
         onSave={handleSaveTeam}
+      />
+
+      <TeamChatModal
+        isOpen={isChatModalOpen}
+        onClose={() => setIsChatModalOpen(false)}
+        team={chatTeam!}
       />
     </div>
   );
