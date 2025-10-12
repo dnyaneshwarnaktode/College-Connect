@@ -49,6 +49,7 @@ app.use(cors({
     
     // Check if origin is in allowed origins (string match)
     if (allowedOrigins.includes(origin)) {
+      console.log('CORS Allowed:', origin);
       return callback(null, true);
     }
     
