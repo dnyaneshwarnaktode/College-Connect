@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom';
+import { useState } from 'react';
 import { 
   Home, 
   Calendar, 
@@ -11,9 +12,11 @@ import {
   BookOpen,
   X,
   LogOut,
-  School
+  School,
+  Bot
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import AIAssistant from '../AIAssistant';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -22,6 +25,7 @@ interface SidebarProps {
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const { user, logout } = useAuth();
+  const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);
 
   const getNavigationItems = () => {
     const baseItems = [
@@ -109,7 +113,14 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             ))}
           </nav>
 
-          <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="p-4 border-t border-gray-200 dark:border-gray-700 space-y-2">
+            <button
+              onClick={() => setIsAIAssistantOpen(true)}
+              className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+            >
+              <Bot size={20} />
+              <span className="font-medium">AI Assistant</span>
+            </button>
             <button
               onClick={() => {
                 logout();
@@ -123,6 +134,12 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           </div>
         </div>
       </aside>
+
+      {/* AI Assistant Modal */}
+      <AIAssistant 
+        isOpen={isAIAssistantOpen} 
+        onClose={() => setIsAIAssistantOpen(false)} 
+      />
     </>
   );
 }
