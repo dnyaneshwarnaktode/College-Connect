@@ -15,8 +15,6 @@ const projectRoutes = require('./routes/projects');
 const teamRoutes = require('./routes/teams');
 const analyticsRoutes = require('./routes/analytics');
 const teamChatRoutes = require('./routes/teamChat');
-const challengeRoutes = require('./routes/challenges');
-const leaderboardRoutes = require('./routes/leaderboard');
 const classGroupRoutes = require('./routes/classGroups');
 const searchRoutes = require('./routes/search');
 
@@ -113,8 +111,6 @@ app.use('/api/projects', projectRoutes);
 app.use('/api/teams', teamRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/teams', teamChatRoutes);
-app.use('/api/challenges', challengeRoutes);
-app.use('/api/leaderboard', leaderboardRoutes);
 app.use('/api/class-groups', classGroupRoutes);
 app.use('/api', searchRoutes);
 

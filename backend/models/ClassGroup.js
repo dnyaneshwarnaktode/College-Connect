@@ -87,10 +87,6 @@ const classGroupSchema = new mongoose.Schema({
       type: Boolean,
       default: false
     },
-    showLeaderboard: {
-      type: Boolean,
-      default: true
-    },
     allowFileSharing: {
       type: Boolean,
       default: true

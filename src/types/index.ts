@@ -105,94 +105,7 @@ export interface TeamChat {
   createdAt: string;
 }
 
-export interface Challenge {
-  id: string;
-  title: string;
-  description: string;
-  category: 'dsa' | 'aptitude' | 'programming' | 'web-development' | 'mobile-development' | 'ai-ml';
-  difficulty: 'easy' | 'medium' | 'hard' | 'expert';
-  points: number;
-  timeLimit: number;
-  problemStatement: string;
-  inputFormat: string;
-  outputFormat: string;
-  constraints: string;
-  sampleInput: {
-    input: string;
-    output: string;
-    explanation: string;
-  }[];
-  hints: string[];
-  tags: string[];
-  createdBy: string;
-  createdByName: string;
-  isActive: boolean;
-  isPublished: boolean;
-  publishedAt?: string;
-  attempts: number;
-  solvedBy: number;
-  averageTime: number;
-  successRate: number;
-  createdAt: string;
-}
 
-export interface ChallengeSubmission {
-  id: string;
-  user: string;
-  challenge: string;
-  code: string;
-  language: 'javascript' | 'python' | 'java' | 'cpp' | 'c' | 'go' | 'rust' | 'typescript';
-  status: 'pending' | 'accepted' | 'wrong-answer' | 'time-limit-exceeded' | 'runtime-error' | 'compilation-error';
-  score: number;
-  timeTaken: number;
-  memoryUsed: number;
-  testResults: {
-    testCase: string;
-    passed: boolean;
-    actualOutput?: string;
-    executionTime: number;
-    memoryUsage: number;
-  }[];
-  errorMessage?: string;
-  isCorrect: boolean;
-  submittedAt: string;
-}
-
-export interface UserStats {
-  id: string;
-  user: string;
-  userName: string;
-  totalScore: number;
-  challengesSolved: number;
-  challengesAttempted: number;
-  currentStreak: number;
-  longestStreak: number;
-  lastSubmissionDate?: string;
-  streakStartDate?: string;
-  categoryStats: {
-    [key: string]: {
-      solved: number;
-      attempted: number;
-      score: number;
-    };
-  };
-  difficultyStats: {
-    [key: string]: {
-      solved: number;
-      attempted: number;
-      score: number;
-    };
-  };
-  achievements: {
-    name: string;
-    description: string;
-    icon: string;
-    unlockedAt: string;
-  }[];
-  rank: number;
-  previousRank: number;
-  rankUpdatedAt: string;
-}
 
 export interface ClassGroup {
   id: string;
@@ -218,7 +131,6 @@ export interface ClassGroup {
     allowStudentChat: boolean;
     allowStudentPosts: boolean;
     requireApprovalForPosts: boolean;
-    showLeaderboard: boolean;
     allowFileSharing: boolean;
   };
   announcements: {

@@ -17,8 +17,6 @@ import UserManagement from './pages/admin/UserManagement';
 import Analytics from './pages/admin/Analytics';
 // New feature pages
 import TeamChat from './pages/TeamChat';
-import Challenges from './pages/Challenges';
-import Leaderboard from './pages/Leaderboard';
 import ClassGroups from './pages/ClassGroups';
 import ClassGroupDetail from './pages/ClassGroupDetail';
 
@@ -44,8 +42,6 @@ function AuthenticatedApp() {
         <Route path="projects" element={<Projects />} />
         <Route path="teams" element={<Teams />} />
         <Route path="teams/:teamId/chat" element={<TeamChat />} />
-        <Route path="challenges" element={<Challenges />} />
-        <Route path="leaderboard" element={<Leaderboard />} />
         <Route path="class-groups" element={<ClassGroups />} />
         <Route path="class-groups/:id" element={<ClassGroupDetail />} />
         <Route path="profile" element={<Profile />} />

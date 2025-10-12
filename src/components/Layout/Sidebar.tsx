@@ -11,9 +11,6 @@ import {
   BookOpen,
   X,
   LogOut,
-  Trophy,
-  Code,
-  MessageCircle,
   School
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
@@ -33,8 +30,6 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       { name: 'Forums', icon: MessageSquare, path: '/forums' },
       { name: 'Projects', icon: FolderOpen, path: '/projects' },
       { name: 'Teams', icon: Users, path: '/teams' },
-      { name: 'Challenges', icon: Code, path: '/challenges' },
-      { name: 'Leaderboard', icon: Trophy, path: '/leaderboard' },
     ];
 
     // Add class groups for faculty and students

@@ -7,11 +7,8 @@ const Event = require('./models/Event');
 const ForumPost = require('./models/ForumPost');
 const Project = require('./models/Project');
 const Team = require('./models/Team');
-const Challenge = require('./models/Challenge');
-const ChallengeSubmission = require('./models/ChallengeSubmission');
 const ClassGroup = require('./models/ClassGroup');
 const TeamChat = require('./models/TeamChat');
-const UserStats = require('./models/UserStats');
 
 // Migration script to transfer data from local MongoDB to Atlas
 async function migrateToAtlas() {
@@ -42,8 +39,8 @@ async function migrateToAtlas() {
     // List of collections to migrate
     const collections = [
       'users', 'events', 'forumposts', 'projects', 'teams', 
-      'challenges', 'challengesubmissions', 'classgroups', 
-      'teamchats', 'userstats'
+      'classgroups', 
+      'teamchats'
     ];
     
     console.log('\n📦 Starting data migration...\n');
