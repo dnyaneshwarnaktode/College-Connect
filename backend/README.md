@@ -10,6 +10,7 @@ A comprehensive backend API for the CollegeConnect college engagement platform b
 - **Forum Platform**: Discussion posts with replies and likes
 - **Project Showcase**: Collaborative project management
 - **Team Management**: Create and join teams for various activities
+- **AI Assistant**: Intelligent chatbot powered by OpenAI for platform assistance
 - **Analytics Dashboard**: Comprehensive platform analytics for admins
 - **Security**: Rate limiting, CORS, helmet, input validation
 - **Database**: MongoDB with Mongoose ODM
@@ -23,6 +24,7 @@ A comprehensive backend API for the CollegeConnect college engagement platform b
 - **Validation**: Express Validator
 - **Security**: Helmet, CORS, Rate Limiting
 - **File Upload**: Multer
+- **AI Integration**: OpenAI API for intelligent assistance
 - **Environment**: dotenv
 
 ## 📁 Project Structure
@@ -65,6 +67,7 @@ backend/
    JWT_SECRET=your-super-secret-jwt-key-here
    JWT_EXPIRE=7d
    CLIENT_URL=http://localhost:3000
+   OPENAI_API_KEY=your-openai-api-key-here
    ```
 
 4. **Start MongoDB**
@@ -155,6 +158,13 @@ http://localhost:5000/api
 | DELETE | `/teams/:id` | Delete team | Leader/Admin |
 | POST | `/teams/:id/join` | Join team | Private |
 | DELETE | `/teams/:id/leave` | Leave team | Private |
+
+### AI Assistant
+
+| Method | Endpoint | Description | Access |
+|--------|----------|-------------|---------|
+| POST | `/assistant` | Chat with AI assistant | Private |
+| GET | `/assistant/suggestions` | Get suggested questions | Private |
 
 ### Analytics
 
