@@ -62,16 +62,16 @@ export default function EventModal({ isOpen, onClose, event, onSave, viewOnly = 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-        <div className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" onClick={onClose}></div>
+        <div className="fixed inset-0 transition-opacity bg-dark-900/75 bg-opacity-75" onClick={onClose}></div>
 
-        <div className="inline-block w-full max-w-2xl p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-900 shadow-xl rounded-2xl">
+        <div className="inline-block w-full max-w-2xl p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-dark-800 dark:bg-dark-800 shadow-xl rounded-2xl">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+            <h3 className="text-xl font-semibold text-dark-100 dark:text-dark-100">
               {viewOnly ? 'Event Details' : event ? 'Edit Event' : 'Create New Event'}
             </h3>
             <button
               onClick={onClose}
-              className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="p-2 text-dark-400 hover:text-dark-300 dark:hover:text-dark-300 rounded-lg hover:bg-dark-700 dark:hover:bg-dark-700"
             >
               <X size={20} />
             </button>
@@ -153,6 +153,60 @@ export default function EventModal({ isOpen, onClose, event, onSave, viewOnly = 
                   <div>
                     <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Organizer</p>
                     <p className="text-gray-600 dark:text-gray-400">{event.organizer}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Registered Users */}
+              {event?.registeredUsers && event.registeredUsers.length > 0 && (
+                <div className="space-y-3">
+                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+                    <Users className="w-5 h-5 mr-2 text-purple-500" />
+                    Registered Participants ({event.registeredUsers.length})
+                  </h4>
+                  <div className="max-h-60 overflow-y-auto space-y-2">
+                    {event.registeredUsers.map((registration, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                            <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                              {registration.user.name.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">
+                              {registration.user.name}
+                            </p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              {registration.user.email}
+                            </p>
+                            <div className="flex items-center space-x-2 mt-1">
+                              <span className="inline-flex px-2 py-0.5 text-xs font-medium rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+                                {registration.user.role}
+                              </span>
+                              {registration.user.department && (
+                                <span className="inline-flex px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
+                                  {registration.user.department}
+                                </span>
+                              )}
+                              {registration.user.year && (
+                                <span className="inline-flex px-2 py-0.5 text-xs font-medium rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
+                                  Year {registration.user.year}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            Registered
+                          </p>
+                          <p className="text-xs text-gray-600 dark:text-gray-300">
+                            {new Date(registration.registeredAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}

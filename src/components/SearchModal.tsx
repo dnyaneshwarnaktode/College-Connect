@@ -160,19 +160,19 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div 
         ref={modalRef}
-        className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl max-h-[80vh] flex flex-col border border-gray-200 dark:border-gray-700"
+        className="bg-dark-800 dark:bg-dark-800 rounded-lg shadow-xl w-full max-w-4xl max-h-[80vh] flex flex-col border border-dark-700 dark:border-dark-700"
       >
         {/* Header */}
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="p-6 border-b border-dark-700 dark:border-dark-700">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+            <h2 className="text-xl font-semibold text-dark-100 dark:text-dark-100">
               Search
             </h2>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="p-2 hover:bg-dark-700 dark:hover:bg-dark-700 rounded-lg transition-colors"
             >
-              <X size={20} className="text-gray-500 dark:text-gray-400" />
+              <X size={20} className="text-dark-400 dark:text-dark-400" />
             </button>
           </div>
           

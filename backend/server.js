@@ -17,6 +17,7 @@ const analyticsRoutes = require('./routes/analytics');
 const teamChatRoutes = require('./routes/teamChat');
 const classGroupRoutes = require('./routes/classGroups');
 const aiAssistantRoutes = require('./routes/aiAssistant');
+const notificationRoutes = require('./routes/notifications');
 
 // Import middleware
 const errorHandler = require('./middleware/errorHandler');
@@ -114,6 +115,7 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/teams', teamChatRoutes);
 app.use('/api/class-groups', classGroupRoutes);
 app.use('/api/assistant', aiAssistantRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Error handling middleware
 app.use(notFound);

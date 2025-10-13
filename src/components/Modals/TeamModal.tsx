@@ -49,16 +49,16 @@ export default function TeamModal({ isOpen, onClose, team, onSave }: TeamModalPr
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-        <div className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" onClick={onClose}></div>
+        <div className="fixed inset-0 transition-opacity bg-dark-900/75 bg-opacity-75" onClick={onClose}></div>
 
-        <div className="inline-block w-full max-w-lg p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-900 shadow-xl rounded-2xl">
+        <div className="inline-block w-full max-w-lg p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-dark-800 dark:bg-dark-800 shadow-xl rounded-2xl">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+            <h3 className="text-lg font-medium text-dark-100 dark:text-dark-100">
               {team ? 'Edit Team' : 'Create New Team'}
             </h3>
             <button
               onClick={onClose}
-              className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="p-2 text-dark-400 hover:text-dark-300 dark:hover:text-dark-300 rounded-lg hover:bg-dark-700 dark:hover:bg-dark-700"
             >
               <X size={20} />
             </button>

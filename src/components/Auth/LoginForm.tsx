@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, GraduationCap } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import Logo from '../Logo';
 
 export default function LoginForm() {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -26,41 +27,37 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-dark-950 via-darkblue-950 to-dark-900 dark:from-dark-950 dark:via-darkblue-950 dark:to-dark-900 flex items-center justify-center p-4">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <div className="flex justify-center">
-            <div className="bg-blue-600 p-3 rounded-full">
-              <GraduationCap className="w-8 h-8 text-white" />
-            </div>
-          </div>
-          <h2 className="mt-4 text-3xl font-bold text-gray-900 dark:text-white">
+          <Logo size="lg" className="justify-center" />
+          <h2 className="mt-4 text-3xl font-bold text-dark-100 dark:text-dark-100">
             Welcome to CollegeConnect
           </h2>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">
+          <p className="mt-2 text-dark-300 dark:text-dark-300">
             Sign in to your account
           </p>
         </div>
 
-        <div className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700">
+        <div className="bg-dark-800 dark:bg-dark-800 p-8 rounded-2xl shadow-xl border border-dark-700 dark:border-dark-700">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
+              <div className="bg-red-900/20 dark:bg-red-900/20 border border-red-800 dark:border-red-800 text-red-400 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
                 {error}
               </div>
             )}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-dark-300 dark:text-dark-300 mb-2">
                 Email
               </label>
               <div className="relative">
-                <Mail size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <Mail size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-dark-400" />
                 <input
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="pl-10 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-colors"
+                  className="pl-10 w-full px-4 py-3 border border-dark-600 dark:border-dark-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-darkblue-500 focus:border-transparent bg-dark-700 dark:bg-dark-700 text-dark-100 dark:text-dark-100 transition-colors"
                   placeholder="Enter your email"
                   required
                 />
@@ -68,23 +65,23 @@ export default function LoginForm() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-dark-300 dark:text-dark-300 mb-2">
                 Password
               </label>
               <div className="relative">
-                <Lock size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <Lock size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-dark-400" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="pl-10 pr-10 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-colors"
+                  className="pl-10 pr-10 w-full px-4 py-3 border border-dark-600 dark:border-dark-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-darkblue-500 focus:border-transparent bg-dark-700 dark:bg-dark-700 text-dark-100 dark:text-dark-100 transition-colors"
                   placeholder="Enter your password"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-dark-400 hover:text-dark-300 dark:hover:text-dark-300"
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>

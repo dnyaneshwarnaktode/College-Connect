@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { FolderOpen, Github, ExternalLink, Plus, Search, Filter, Users, Calendar } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import ProjectModal from '../components/Modals/ProjectModal';
 import { Project } from '../types';
+import { ProjectCardSkeleton } from '../components/Skeleton';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
-export default function Projects() {
+function Projects() {
   const { user } = useAuth();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
@@ -18,10 +19,6 @@ export default function Projects() {
   const [selectedProject, setSelectedProject] = useState<Project | undefined>();
   const [isViewMode, setIsViewMode] = useState(false);
 
-  React.useEffect(() => {
-    fetchProjects();
-  }, []);
-
   const getAuthHeaders = () => {
     const token = localStorage.getItem('collegeconnect_token');
     return {
@@ -30,7 +27,7 @@ export default function Projects() {
     };
   };
 
-  const fetchProjects = async () => {
+  const fetchProjects = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -56,15 +53,21 @@ export default function Projects() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [API_BASE_URL]);
 
-  const filteredProjects = projects.filter(project => {
-    const matchesSearch = project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         project.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = filterCategory === 'all' || project.category === filterCategory;
-    const matchesStatus = filterStatus === 'all' || project.status === filterStatus;
-    return matchesSearch && matchesCategory && matchesStatus;
-  });
+  useEffect(() => {
+    fetchProjects();
+  }, [fetchProjects]);
+
+  const filteredProjects = useMemo(() => {
+    return projects.filter(project => {
+      const matchesSearch = project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           project.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = filterCategory === 'all' || project.category === filterCategory;
+      const matchesStatus = filterStatus === 'all' || project.status === filterStatus;
+      return matchesSearch && matchesCategory && matchesStatus;
+    });
+  }, [projects, searchTerm, filterCategory, filterStatus]);
 
   const handleCreateProject = () => {
     setSelectedProject(undefined);
@@ -147,12 +150,12 @@ export default function Projects() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Projects</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">Showcase and collaborate on amazing projects</p>
+          <h1 className="text-3xl font-bold text-dark-100 dark:text-dark-100">Projects</h1>
+          <p className="text-dark-300 dark:text-dark-300 mt-1">Showcase and collaborate on amazing projects</p>
         </div>
         <button 
           onClick={handleCreateProject}
-          className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+          className="flex items-center space-x-2 bg-darkblue-600 hover:bg-darkblue-700 text-white px-4 py-2 rounded-lg transition-colors"
         >
           <Plus size={18} />
           <span>New Project</span>
@@ -214,8 +217,10 @@ export default function Projects() {
 
       {/* Loading State */}
       {loading ? (
-        <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <ProjectCardSkeleton key={index} />
+          ))}
         </div>
       ) : (
         <>
@@ -343,3 +348,5 @@ export default function Projects() {
     </div>
   );
 }
+
+export default React.memo(Projects);

@@ -2,12 +2,14 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { SearchProvider } from './contexts/SearchContext';
+import ErrorBoundary from './components/ErrorBoundary';
 import DashboardLayout from './components/Layout/DashboardLayout';
 import LoginForm from './components/Auth/LoginForm';
 import SignupForm from './components/Auth/SignupForm';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import Events from './pages/Events';
+import EventDetails from './pages/EventDetails';
 import Forums from './pages/Forums';
 import Projects from './pages/Projects';
 import Teams from './pages/Teams';
@@ -38,6 +40,7 @@ function AuthenticatedApp() {
         <Route index element={<Home />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="events" element={<Events />} />
+        <Route path="events/:id" element={<EventDetails />} />
         <Route path="forums" element={<Forums />} />
         <Route path="projects" element={<Projects />} />
         <Route path="teams" element={<Teams />} />
@@ -56,17 +59,19 @@ function AuthenticatedApp() {
 
 function App() {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <SearchProvider>
-          <Router>
-            <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
-              <AuthenticatedApp />
-            </div>
-          </Router>
-        </SearchProvider>
-      </AuthProvider>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <AuthProvider>
+          <SearchProvider>
+            <Router>
+              <div className="min-h-screen bg-dark-950 dark:bg-dark-950 transition-colors">
+                <AuthenticatedApp />
+              </div>
+            </Router>
+          </SearchProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }
 

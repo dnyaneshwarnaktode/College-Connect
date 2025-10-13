@@ -165,28 +165,28 @@ Note: If you see any configuration errors, the AI service is being set up. You c
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl h-[600px] flex flex-col">
+    <div className="fixed inset-0 bg-dark-900/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-dark-800 dark:bg-dark-800 rounded-lg shadow-xl w-full max-w-2xl h-[600px] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between p-4 border-b border-dark-700 dark:border-dark-700">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
-              <Bot className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <div className="w-8 h-8 bg-darkblue-900/30 dark:bg-darkblue-900/30 rounded-full flex items-center justify-center">
+              <Bot className="w-5 h-5 text-darkblue-400 dark:text-darkblue-400" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h3 className="text-lg font-semibold text-dark-100 dark:text-dark-100">
                 CollegeConnect Copilot
               </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-dark-400 dark:text-dark-400">
                 Your AI assistant
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+            className="p-2 hover:bg-dark-700 dark:hover:bg-dark-700 rounded-full transition-colors"
           >
-            <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+            <X className="w-5 h-5 text-dark-400 dark:text-dark-400" />
           </button>
         </div>
 
@@ -250,20 +250,20 @@ Note: If you see any configuration errors, the AI service is being set up. You c
         )}
 
         {/* Input */}
-        <form onSubmit={handleSubmit} className="p-4 border-t border-gray-200 dark:border-gray-700">
+        <form onSubmit={handleSubmit} className="p-4 border-t border-dark-700 dark:border-dark-700">
           <div className="flex space-x-2">
             <input
               type="text"
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               placeholder="Ask me anything about CollegeConnect..."
-              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+              className="flex-1 px-3 py-2 border border-dark-600 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-darkblue-500 focus:border-transparent bg-dark-700 dark:bg-dark-700 text-dark-100 dark:text-dark-100 placeholder-dark-400 dark:placeholder-dark-400"
               disabled={isLoading}
             />
             <button
               type="submit"
               disabled={!inputMessage.trim() || isLoading}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg transition-colors flex items-center space-x-2"
+              className="px-4 py-2 bg-darkblue-600 hover:bg-darkblue-700 disabled:bg-dark-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors flex items-center space-x-2"
             >
               <Send className="w-4 h-4" />
             </button>

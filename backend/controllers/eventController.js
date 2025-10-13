@@ -1,5 +1,6 @@
 const Event = require('../models/Event');
 const User = require('../models/User');
+const NotificationService = require('../services/notificationService');
 
 // @desc    Get all events
 // @route   GET /api/events
@@ -132,6 +133,14 @@ const createEvent = async (req, res) => {
     });
 
     await event.populate('createdBy', 'name email role');
+
+    // Create notifications for all users about the new event
+    try {
+      const allUsers = await NotificationService.getAllUsers();
+      await NotificationService.createNewEventNotification(allUsers, event.title, event._id);
+    } catch (error) {
+      console.error('Error creating new event notifications:', error);
+    }
 
     res.status(201).json({
       success: true,
@@ -287,6 +296,17 @@ const registerForEvent = async (req, res) => {
       req.user.id,
       { $addToSet: { registeredEvents: event._id } }
     );
+
+    // Create notification for successful registration
+    try {
+      await NotificationService.createEventRegistrationNotification(
+        req.user.id, 
+        event.title, 
+        event._id
+      );
+    } catch (error) {
+      console.error('Error creating registration notification:', error);
+    }
 
     res.json({
       success: true,

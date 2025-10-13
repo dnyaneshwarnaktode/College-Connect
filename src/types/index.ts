@@ -25,6 +25,17 @@ export interface Event {
   registered: number;
   image?: string;
   createdBy: string;
+  registeredUsers?: {
+    user: {
+      _id: string;
+      name: string;
+      email: string;
+      role: string;
+      department?: string;
+      year?: number;
+    };
+    registeredAt: string;
+  }[];
   createdAt: string;
 }
 

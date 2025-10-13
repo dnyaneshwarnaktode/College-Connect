@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Calendar, MapPin, Users, Clock, Plus, Filter, Search } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import EventModal from '../components/Modals/EventModal';
 import { Event } from '../types';
+import { EventCardSkeleton } from '../components/Skeleton';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
-export default function Events() {
+function Events() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -18,13 +21,6 @@ export default function Events() {
   const [selectedEvent, setSelectedEvent] = useState<Event | undefined>();
   const [registeredEvents, setRegisteredEvents] = useState<string[]>([]);
 
-  React.useEffect(() => {
-    fetchEvents();
-    if (user) {
-      fetchUserRegistrations();
-    }
-  }, [user]);
-
   const getAuthHeaders = () => {
     const token = localStorage.getItem('collegeconnect_token');
     return {
@@ -33,7 +29,7 @@ export default function Events() {
     };
   };
 
-  const fetchEvents = async () => {
+  const fetchEvents = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -60,7 +56,14 @@ export default function Events() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [API_BASE_URL]);
+
+  useEffect(() => {
+    fetchEvents();
+    if (user) {
+      fetchUserRegistrations();
+    }
+  }, [user, fetchEvents]);
 
   const fetchUserRegistrations = async () => {
     try {
@@ -90,13 +93,15 @@ export default function Events() {
     return event.registered >= event.capacity;
   };
 
-  const filteredEvents = events.filter(event => {
-    const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         event.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = filterCategory === 'all' || event.category === filterCategory;
-    const matchesPastFilter = showPastEvents || !isEventPast(event.date);
-    return matchesSearch && matchesCategory && matchesPastFilter;
-  });
+  const filteredEvents = useMemo(() => {
+    return events.filter(event => {
+      const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           event.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = filterCategory === 'all' || event.category === filterCategory;
+      const matchesPastFilter = showPastEvents || !isEventPast(event.date);
+      return matchesSearch && matchesCategory && matchesPastFilter;
+    });
+  }, [events, searchTerm, filterCategory, showPastEvents]);
 
   const handleCreateEvent = () => {
     setSelectedEvent(undefined);
@@ -158,20 +163,29 @@ export default function Events() {
         throw new Error('Invalid event ID');
       }
       
-      if (!registeredEvents.includes(eventId)) {
-        const response = await fetch(`${API_BASE_URL}/events/${eventId}/register`, {
-          method: 'POST',
-          headers: getAuthHeaders()
-        });
-        
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Failed to register for event');
-        }
-        
-        setRegisteredEvents([...registeredEvents, eventId]);
-        await fetchEvents();
+      // Check if already registered
+      if (registeredEvents.includes(eventId)) {
+        return; // Already registered, no need to make API call
       }
+
+      const response = await fetch(`${API_BASE_URL}/events/${eventId}/register`, {
+        method: 'POST',
+        headers: getAuthHeaders()
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        // Handle "already registered" as a success case, not an error
+        if (errorData.message && errorData.message.includes('Already registered')) {
+          setRegisteredEvents([...registeredEvents, eventId]);
+          await fetchEvents();
+          return; // Exit early, don't throw error
+        }
+        throw new Error(errorData.message || 'Failed to register for event');
+      }
+      
+      setRegisteredEvents([...registeredEvents, eventId]);
+      await fetchEvents();
     } catch (error) {
       console.error('Error registering for event:', error);
       setError(error instanceof Error ? error.message : 'Failed to register for event. Please try again.');
@@ -179,8 +193,7 @@ export default function Events() {
   };
 
   const handleViewEventDetails = (event: Event) => {
-    setSelectedEvent(event);
-    setIsModalOpen(true);
+    navigate(`/events/${event.id}`);
   };
 
   const getCategoryColor = (category: string) => {
@@ -197,13 +210,13 @@ export default function Events() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Events</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">Discover and join exciting college events</p>
+          <h1 className="text-3xl font-bold text-dark-100 dark:text-dark-100">Events</h1>
+          <p className="text-dark-300 dark:text-dark-300 mt-1">Discover and join exciting college events</p>
         </div>
         {(user?.role === 'admin' || user?.role === 'faculty') && (
           <button 
             onClick={handleCreateEvent}
-            className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+            className="flex items-center space-x-2 bg-darkblue-600 hover:bg-darkblue-700 text-white px-4 py-2 rounded-lg transition-colors"
           >
             <Plus size={18} />
             <span>Create Event</span>
@@ -266,8 +279,10 @@ export default function Events() {
 
       {/* Loading State */}
       {loading ? (
-        <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <EventCardSkeleton key={index} />
+          ))}
         </div>
       ) : (
         <>
@@ -409,3 +424,5 @@ export default function Events() {
     </div>
   );
 }
+
+export default React.memo(Events);

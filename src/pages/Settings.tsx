@@ -675,8 +675,8 @@ export default function Settings() {
                         onClick={() => handleInputChange('theme', themeOption.value)}
                         className={`p-4 rounded-lg border-2 transition-colors ${
                           settings.theme === themeOption.value
-                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                            : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                            ? 'border-darkblue-500 bg-darkblue-900/20 dark:bg-darkblue-900/20'
+                            : 'border-dark-700 dark:border-dark-700 hover:border-dark-600 dark:hover:border-dark-600'
                         }`}
                       >
                         <div className="text-2xl mb-2">{themeOption.icon}</div>

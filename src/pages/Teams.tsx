@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Users, Crown, Plus, Search, Filter, Calendar, UserPlus, Eye, X, UserMinus, MessageCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import TeamModal from '../components/Modals/TeamModal';
 import TeamChatModal from '../components/Modals/TeamChatModal';
 import { Team } from '../types';
+import { CardSkeleton } from '../components/Skeleton';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
-export default function Teams() {
+function Teams() {
   const { user } = useAuth();
   const [teams, setTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(true);
@@ -233,12 +234,12 @@ export default function Teams() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Teams</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">Join or create teams for projects and activities</p>
+          <h1 className="text-3xl font-bold text-dark-100 dark:text-dark-100">Teams</h1>
+          <p className="text-dark-300 dark:text-dark-300 mt-1">Join or create teams for projects and activities</p>
         </div>
         <button 
           onClick={handleCreateTeam}
-          className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+          className="flex items-center space-x-2 bg-darkblue-600 hover:bg-darkblue-700 text-white px-4 py-2 rounded-lg transition-colors"
         >
           <Plus size={18} />
           <span>Create Team</span>
@@ -683,3 +684,5 @@ export default function Teams() {
     </div>
   );
 }
+
+export default React.memo(Teams);

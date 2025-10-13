@@ -1,75 +1,58 @@
-import React from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Calendar, Users, MessageSquare, FolderOpen, TrendingUp, Clock, Star } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Event, ForumPost, Project } from '../types';
+import { CardSkeleton, ListSkeleton } from '../components/Skeleton';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
-export default function Dashboard() {
+function Dashboard() {
   const { user } = useAuth();
-  const [events, setEvents] = React.useState<Event[]>([]);
-  const [posts, setPosts] = React.useState<ForumPost[]>([]);
-  const [projects, setProjects] = React.useState<Project[]>([]);
-  // teams are not used on this dashboard view
+  const [events, setEvents] = useState<Event[]>([]);
+  const [posts, setPosts] = useState<ForumPost[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  React.useEffect(() => {
-    fetchDashboardData();
-  }, []);
-
-  const getAuthHeaders = () => {
+  const getAuthHeaders = useCallback(() => {
     const token = localStorage.getItem('collegeconnect_token');
     return {
       'Content-Type': 'application/json',
       ...(token && { 'Authorization': `Bearer ${token}` })
     };
-  };
+  }, []);
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     try {
+      setLoading(true);
+      
+      const headers = getAuthHeaders();
       const [eventsRes, postsRes, projectsRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/events?limit=3`, { headers: getAuthHeaders() }),
-        fetch(`${API_BASE_URL}/forums?limit=3`, { headers: getAuthHeaders() }),
-        fetch(`${API_BASE_URL}/projects?limit=3`, { headers: getAuthHeaders() })
+        fetch(`${API_BASE_URL}/events?limit=5`, { headers }),
+        fetch(`${API_BASE_URL}/forums?limit=5`, { headers }),
+        fetch(`${API_BASE_URL}/projects?limit=5`, { headers })
       ]);
 
-      if (eventsRes.ok) {
-        const eventsData = await eventsRes.json();
-        const normalizedEvents = (eventsData.events || []).map((event: any) => ({
-          ...event,
-          id: event._id ? (typeof event._id === 'string' ? event._id : event._id.toString()) : 
-              (event.id ? (typeof event.id === 'string' ? event.id : event.id.toString()) : 
-              String(Date.now() + Math.random()))
-        }));
-        setEvents(normalizedEvents);
-      }
+      const [eventsData, postsData, projectsData] = await Promise.all([
+        eventsRes.json(),
+        postsRes.json(),
+        projectsRes.json()
+      ]);
 
-      if (postsRes.ok) {
-        const postsData = await postsRes.json();
-        const normalizedPosts = (postsData.posts || []).map((post: any) => ({
-          ...post,
-          id: post.id || post._id
-        }));
-        setPosts(normalizedPosts);
-      }
-
-      if (projectsRes.ok) {
-        const projectsData = await projectsRes.json();
-        const normalizedProjects = (projectsData.projects || []).map((project: any) => ({
-          ...project,
-          id: project.id || project._id
-        }));
-        setProjects(normalizedProjects);
-      }
-
-      // no teams used
-    } catch (error) {
-      console.error('Error fetching dashboard data:', error);
+      if (eventsData.success) setEvents(eventsData.events);
+      if (postsData.success) setPosts(postsData.posts);
+      if (projectsData.success) setProjects(projectsData.projects);
+    } catch (err) {
+      console.error('Error fetching dashboard data:', err);
     } finally {
-      // no-op
+      setLoading(false);
     }
-  };
+  }, [API_BASE_URL, getAuthHeaders]);
 
-  const getDashboardStats = () => {
+  useEffect(() => {
+    fetchDashboardData();
+  }, [fetchDashboardData]);
+
+  const getDashboardStats = useMemo(() => {
     switch (user?.role) {
       case 'admin':
         return [
@@ -93,132 +76,158 @@ export default function Dashboard() {
           { title: 'Forum Posts', value: '12', icon: MessageSquare, color: 'bg-orange-500', change: '+3' },
         ];
     }
-  };
-
-  const stats = getDashboardStats();
+  }, [user?.role, events.length, posts.length, projects.length]);
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Welcome back, {user?.name}
+        <h1 className="text-3xl font-bold text-dark-100 dark:text-dark-100">
+          Welcome back, {user?.name}!
         </h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-1">
+        <p className="text-dark-300 dark:text-dark-300 mt-1">
           Here's what's happening in your college community
         </p>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat) => (
-          <div key={stat.title} className="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                  {stat.title}
-                </p>
-                <div className="flex items-center mt-2">
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {stat.value}
+        {loading ? (
+          Array.from({ length: 4 }).map((_, index) => (
+            <CardSkeleton key={index} />
+          ))
+        ) : (
+          getDashboardStats.map((stat) => (
+            <div key={stat.title} className="bg-dark-800 dark:bg-dark-800 p-6 rounded-xl shadow-sm border border-dark-700 dark:border-dark-700 hover:shadow-md transition-shadow">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-dark-400 dark:text-dark-400">
+                    {stat.title}
                   </p>
-                  <span className="ml-2 text-sm text-green-600 font-medium flex items-center">
-                    <TrendingUp size={14} className="mr-1" />
-                    {stat.change}
-                  </span>
+                  <div className="flex items-center mt-2">
+                    <p className="text-2xl font-bold text-dark-100 dark:text-dark-100">
+                      {stat.value}
+                    </p>
+                    <span className="ml-2 text-sm text-green-400 font-medium flex items-center">
+                      <TrendingUp size={14} className="mr-1" />
+                      {stat.change}
+                    </span>
+                  </div>
+                </div>
+                <div className={`${stat.color} p-3 rounded-lg`}>
+                  <stat.icon className="w-6 h-6 text-white" />
                 </div>
               </div>
-              <div className={`${stat.color} p-3 rounded-lg`}>
-                <stat.icon className="w-6 h-6 text-white" />
-              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Events */}
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
-              <Calendar className="w-5 h-5 mr-2 text-blue-600" />
+        <div className="bg-dark-800 dark:bg-dark-800 rounded-xl shadow-sm border border-dark-700 dark:border-dark-700">
+          <div className="p-6 border-b border-dark-700 dark:border-dark-700">
+            <h2 className="text-xl font-semibold text-dark-100 dark:text-dark-100 flex items-center">
+              <Calendar className="w-5 h-5 mr-2 text-darkblue-600" />
               Upcoming Events
             </h2>
           </div>
           <div className="p-6 space-y-4">
-            {events.slice(0, 3).map((event) => (
-              <div key={event.id} className="flex items-start space-x-4 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                <div className="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-lg">
-                  <Calendar className="w-4 h-4 text-blue-600" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                    {event.title}
-                  </p>
-                  <div className="flex items-center mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    <Clock className="w-4 h-4 mr-1" />
-                    {new Date(event.date).toLocaleDateString()} at {event.time}
+            {loading ? (
+              <ListSkeleton items={3} />
+            ) : events.length === 0 ? (
+              <p className="text-dark-400 dark:text-dark-400 text-center py-8">
+                No upcoming events
+              </p>
+            ) : (
+              events.slice(0, 3).map((event) => (
+                <div key={event.id} className="flex items-start space-x-4 p-3 rounded-lg hover:bg-dark-700 dark:hover:bg-dark-700 transition-colors">
+                  <div className="bg-darkblue-100 dark:bg-darkblue-900/30 p-2 rounded-lg">
+                    <Calendar className="w-4 h-4 text-darkblue-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-dark-100 dark:text-dark-100 truncate">
+                      {event.title}
+                    </p>
+                    <div className="flex items-center mt-1 text-sm text-dark-400 dark:text-dark-400">
+                      <Clock className="w-4 h-4 mr-1" />
+                      {new Date(event.date).toLocaleDateString()} at {event.time}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
 
         {/* Active Projects */}
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
+        <div className="bg-dark-800 dark:bg-dark-800 rounded-xl shadow-sm border border-dark-700 dark:border-dark-700">
+          <div className="p-6 border-b border-dark-700 dark:border-dark-700">
+            <h2 className="text-xl font-semibold text-dark-100 dark:text-dark-100 flex items-center">
               <FolderOpen className="w-5 h-5 mr-2 text-purple-600" />
               Recent Projects
             </h2>
           </div>
           <div className="p-6 space-y-4">
-            {projects.slice(0, 3).map((project) => (
-              <div key={project.id} className="flex items-start space-x-4 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                <div className="bg-purple-100 dark:bg-purple-900/30 p-2 rounded-lg">
-                  <FolderOpen className="w-4 h-4 text-purple-600" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                    {project.title}
-                  </p>
-                  <div className="flex items-center mt-1">
-                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                      project.status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
-                      project.status === 'completed' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' :
-                      'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400'
-                    }`}>
-                      {project.status}
-                    </span>
+            {loading ? (
+              <ListSkeleton items={3} />
+            ) : projects.length === 0 ? (
+              <p className="text-dark-400 dark:text-dark-400 text-center py-8">
+                No recent projects
+              </p>
+            ) : (
+              projects.slice(0, 3).map((project) => (
+                <div key={project.id} className="flex items-start space-x-4 p-3 rounded-lg hover:bg-dark-700 dark:hover:bg-dark-700 transition-colors">
+                  <div className="bg-purple-100 dark:bg-purple-900/30 p-2 rounded-lg">
+                    <FolderOpen className="w-4 h-4 text-purple-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-dark-100 dark:text-dark-100 truncate">
+                      {project.title}
+                    </p>
+                    <div className="flex items-center mt-1">
+                      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                        project.status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
+                        project.status === 'completed' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' :
+                        'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400'
+                      }`}>
+                        {project.status}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-          <Star className="w-5 h-5 mr-2 text-yellow-600" />
+      <div className="bg-gradient-to-r from-darkblue-900/40 to-dark-800/60 backdrop-blur-md rounded-xl shadow-2xl border border-darkblue-700/30 p-6">
+        <h2 className="text-xl font-semibold text-dark-100 dark:text-dark-100 mb-4 flex items-center">
+          <Star className="w-5 h-5 mr-2 text-darkblue-400" />
           Quick Actions
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <a href="/events" className="flex items-center space-x-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors text-left">
-            <Calendar className="w-5 h-5 text-blue-600" />
-            <span className="font-medium text-gray-900 dark:text-white">Create Event</span>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <a href="/events" className="bg-darkblue-900/30 hover:bg-darkblue-900/40 transition-colors text-left border border-darkblue-700/20 rounded-lg p-4 group">
+            <Calendar className="w-6 h-6 text-darkblue-400 mb-2 group-hover:scale-110 transition-transform" />
+            <span className="font-medium text-dark-100 dark:text-dark-100">Browse Events</span>
           </a>
-          <a href="/projects" className="flex items-center space-x-3 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors text-left">
-            <FolderOpen className="w-5 h-5 text-green-600" />
-            <span className="font-medium text-gray-900 dark:text-white">Start Project</span>
+          <a href="/projects" className="bg-green-900/30 hover:bg-green-900/40 transition-colors text-left border border-green-700/20 rounded-lg p-4 group">
+            <FolderOpen className="w-6 h-6 text-green-400 mb-2 group-hover:scale-110 transition-transform" />
+            <span className="font-medium text-dark-100 dark:text-dark-100">View Projects</span>
           </a>
-          <a href="/teams" className="flex items-center space-x-3 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors text-left">
-            <Users className="w-5 h-5 text-purple-600" />
-            <span className="font-medium text-gray-900 dark:text-white">Join Team</span>
+          <a href="/forums" className="bg-purple-900/30 hover:bg-purple-900/40 transition-colors text-left border border-purple-700/20 rounded-lg p-4 group">
+            <MessageSquare className="w-6 h-6 text-purple-400 mb-2 group-hover:scale-110 transition-transform" />
+            <span className="font-medium text-dark-100 dark:text-dark-100">Start Discussion</span>
+          </a>
+          <a href="/teams" className="bg-darkblue-900/30 hover:bg-darkblue-900/40 transition-colors text-left border border-darkblue-700/20 rounded-lg p-4 group">
+            <Users className="w-6 h-6 text-darkblue-400 mb-2 group-hover:scale-110 transition-transform" />
+            <span className="font-medium text-dark-100 dark:text-dark-100">Join Team</span>
           </a>
         </div>
       </div>
     </div>
   );
 }
+
+export default React.memo(Dashboard);

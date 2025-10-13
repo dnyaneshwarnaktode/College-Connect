@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { MessageSquare, ThumbsUp, Reply, Plus, Search, Filter, Clock, User } from 'lucide-react';
 import ForumPostModal from '../components/Modals/ForumPostModal';
 import ReplyModal from '../components/Modals/ReplyModal';
 import { ForumPost, Reply as ReplyType } from '../types';
 import { useAuth } from '../contexts/AuthContext';
+import { CardSkeleton } from '../components/Skeleton';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
-export default function Forums() {
+function Forums() {
   const { user } = useAuth();
   const [posts, setPosts] = useState<ForumPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -543,3 +544,5 @@ export default function Forums() {
     </div>
   );
 }
+
+export default React.memo(Forums);
