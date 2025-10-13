@@ -21,6 +21,9 @@ import Analytics from './pages/admin/Analytics';
 import TeamChat from './pages/TeamChat';
 import ClassGroups from './pages/ClassGroups';
 import ClassGroupDetail from './pages/ClassGroupDetail';
+// Footer pages
+import About from './pages/About';
+import Contact from './pages/Contact';
 
 function AuthenticatedApp() {
   const { user } = useAuth();
@@ -51,6 +54,9 @@ function AuthenticatedApp() {
         <Route path="settings" element={<Settings />} />
         <Route path="admin/users" element={<UserManagement />} />
         <Route path="admin/analytics" element={<Analytics />} />
+        {/* Footer pages */}
+        <Route path="about" element={<About />} />
+        <Route path="contact" element={<Contact />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
