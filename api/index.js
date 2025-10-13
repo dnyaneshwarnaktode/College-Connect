@@ -25,6 +25,9 @@ const notFound = require('../backend/middleware/notFound');
 
 const app = express();
 
+// Trust proxy for Vercel serverless functions
+app.set('trust proxy', 1);
+
 // CORS configuration
 const allowedOrigins = [
   'http://localhost:5173',
@@ -73,13 +76,15 @@ app.use(cors({
 // Security middleware
 app.use(helmet());
 
-// Rate limiting (more lenient in development)
+// Rate limiting (configured for serverless functions)
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: process.env.NODE_ENV === 'development' ? 1000 : 100, // Higher limit in dev mode
+  max: process.env.NODE_ENV === 'development' ? 1000 : 200, // Higher limit for serverless
   message: 'Too many requests from this IP, please try again later.',
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  skipSuccessfulRequests: true, // Don't count successful requests
+  skipFailedRequests: false, // Count failed requests
 });
 app.use('/api/', limiter); // Apply only to API routes
 

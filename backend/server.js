@@ -25,6 +25,11 @@ const notFound = require('./middleware/notFound');
 
 const app = express();
 
+// Trust proxy for production deployments
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
 // CORS configuration (must be before other middleware)
 const allowedOrigins = [
   'http://localhost:5173',
