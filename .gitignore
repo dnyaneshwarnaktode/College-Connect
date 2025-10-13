@@ -6,6 +6,7 @@
 .env.production.local
 .env.backup
 .env.*
+.env.example
 
 # Dependencies
 node_modules/

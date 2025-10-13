@@ -61,8 +61,10 @@ export default function SignupForm() {
         department: formData.department.trim(),
         year: formData.role === 'student' ? parseInt(formData.year) : undefined
       });
-    } catch (err) {
-      setError('Registration failed. Please try again.');
+      // Registration successful - will be redirected by AuthContext
+    } catch (err: any) {
+      console.error('Registration error:', err);
+      setError(err?.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -145,7 +147,6 @@ export default function SignupForm() {
                 >
                   <option value="student">Student</option>
                   <option value="faculty">Faculty</option>
-                  <option value="admin">Administrator</option>
                 </select>
               </div>
             </div>
@@ -186,8 +187,6 @@ export default function SignupForm() {
                       <option value="2">2nd Year</option>
                       <option value="3">3rd Year</option>
                       <option value="4">4th Year</option>
-                      <option value="5">5th Year</option>
-                      <option value="6">6th Year</option>
                     </select>
                   </div>
                 </div>
@@ -267,7 +266,6 @@ export default function SignupForm() {
             <div className="space-y-1 text-xs text-blue-700 dark:text-blue-400">
               <div><strong>Student:</strong> Access events, forums, projects, and teams</div>
               <div><strong>Faculty:</strong> Create events, mentor projects, moderate forums</div>
-              <div><strong>Admin:</strong> Full platform management and analytics access</div>
             </div>
           </div>
         </div>
