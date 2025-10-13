@@ -55,28 +55,24 @@ function Home() {
       icon: Calendar,
       title: 'Events & Activities',
       description: 'Discover and participate in exciting campus events, workshops, and seminars.',
-      color: 'from-emerald-500 to-teal-600',
       link: '/events'
     },
     {
       icon: Users,
       title: 'Teams & Collaboration',
       description: 'Join teams, collaborate with peers, and work on amazing projects together.',
-      color: 'from-violet-500 to-purple-600',
       link: '/teams'
     },
     {
       icon: FolderOpen,
       title: 'Project Showcase',
       description: 'Share your innovative projects and get inspired by others\' work.',
-      color: 'from-rose-500 to-pink-600',
       link: '/projects'
     },
     {
       icon: MessageSquare,
       title: 'Discussion Forums',
       description: 'Engage in meaningful discussions, ask questions, and share knowledge.',
-      color: 'from-amber-500 to-orange-600',
       link: '/forums'
     }
   ], []);
@@ -89,16 +85,16 @@ function Home() {
   ], [stats, loading]);
 
   const quickActions = useMemo(() => [
-    { icon: BookOpen, label: 'Browse Events', action: () => navigate('/events'), color: 'bg-darkblue-600 hover:bg-darkblue-700' },
-    { icon: Users, label: 'Join a Team', action: () => navigate('/teams'), color: 'bg-purple-600 hover:bg-purple-700' },
-    { icon: Trophy, label: 'View Projects', action: () => navigate('/projects'), color: 'bg-rose-600 hover:bg-rose-700' },
-    { icon: Zap, label: 'Start Discussion', action: () => navigate('/forums'), color: 'bg-amber-600 hover:bg-amber-700' }
+    { icon: BookOpen, label: 'Browse Events', action: () => navigate('/events'), color: 'bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30' },
+    { icon: Users, label: 'Join a Team', action: () => navigate('/teams'), color: 'bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30' },
+    { icon: Trophy, label: 'View Projects', action: () => navigate('/projects'), color: 'bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30' },
+    { icon: Zap, label: 'Start Discussion', action: () => navigate('/forums'), color: 'bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30' }
   ], [navigate]);
 
   return (
     <div className="relative min-h-screen overflow-hidden">
       {/* Animated Background */}
-      <div className="fixed inset-0 bg-gradient-to-br from-dark-950 via-darkblue-950 to-dark-900 dark:from-dark-950 dark:via-darkblue-950 dark:to-dark-900">
+      <div className="fixed inset-0 bg-dark-950 dark:bg-dark-950">
         <Squares 
           speed={0.5} 
           squareSize={40}
@@ -120,7 +116,7 @@ function Home() {
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight">
             Connect, Collaborate,
             <br />
-            <span className="bg-gradient-to-r from-darkblue-400 via-blue-400 to-darkblue-300 bg-clip-text text-transparent">
+            <span className="text-darkblue-400">
               Create Together
             </span>
           </h1>
@@ -133,7 +129,7 @@ function Home() {
           <div className="flex flex-wrap items-center justify-center gap-4">
             <button 
               onClick={() => navigate('/dashboard')}
-              className="group px-6 py-3 bg-gradient-to-r from-darkblue-500 to-blue-600 text-white rounded-xl font-semibold text-base shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center space-x-2 hover:scale-105"
+              className="group px-6 py-3 bg-white/20 backdrop-blur-sm text-white rounded-xl font-semibold text-base shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center space-x-2 hover:scale-105 border border-white/30"
             >
               <span>Go to Dashboard</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -197,7 +193,7 @@ function Home() {
                   onClick={() => navigate(feature.link)}
                   className="group bg-dark-700/50 backdrop-blur-md p-4 rounded-xl border border-dark-600/50 hover:bg-dark-600/50 transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-2xl"
                 >
-                  <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${feature.color} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
+                  <div className="w-10 h-10 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform border border-white/30">
                     <feature.icon className="w-5 h-5 text-white" />
                   </div>
                   <h3 className="text-lg font-semibold text-dark-100 mb-2 group-hover:text-darkblue-300 transition-colors">

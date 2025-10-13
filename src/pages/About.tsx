@@ -98,7 +98,7 @@ export default function About() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       {/* Hero Section */}
-      <div className="bg-gradient-to-br from-darkblue-600 via-purple-600 to-darkblue-800 text-white">
+      <div className="bg-transparent text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
@@ -108,7 +108,7 @@ export default function About() {
               Empowering students to connect, collaborate, and succeed in their academic journey
             </p>
             <div className="flex justify-center">
-              <button className="bg-white text-darkblue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors flex items-center">
+              <button className="bg-white/20 backdrop-blur-sm text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/30 transition-colors flex items-center border border-white/30">
                 Join Our Community
                 <ArrowRight size={20} className="ml-2" />
               </button>
@@ -279,7 +279,7 @@ export default function About() {
               </div>
             </div>
             <div className="relative">
-              <div className="bg-gradient-to-br from-darkblue-500 to-purple-600 rounded-2xl p-8 text-white">
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 text-white border border-white/20">
                 <div className="text-center">
                   <Award size={48} className="mx-auto mb-4" />
                   <h3 className="text-2xl font-bold mb-4">Award-Winning Platform</h3>
@@ -304,7 +304,7 @@ export default function About() {
       </div>
 
       {/* CTA Section */}
-      <div className="py-20 bg-gradient-to-r from-darkblue-600 to-purple-600 text-white">
+      <div className="py-20 bg-transparent text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             Ready to Join Our Community?
@@ -313,10 +313,10 @@ export default function About() {
             Be part of a growing community of students, faculty, and alumni working together to achieve their goals.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-white text-darkblue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
+            <button className="bg-white/20 backdrop-blur-sm text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/30 transition-colors border border-white/30">
               Get Started Today
             </button>
-            <button className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-darkblue-600 transition-colors">
+            <button className="border-2 border-white/50 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors backdrop-blur-sm">
               Learn More
             </button>
           </div>
