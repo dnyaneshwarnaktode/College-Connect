@@ -9,16 +9,21 @@ export default function DashboardLayout() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors flex flex-col">
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      {/* Navbar positioned above sidebar */}
+      <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       
-      <div className="lg:pl-64 flex flex-col flex-1">
-        <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+      <div className="flex flex-1">
+        {/* Sidebar */}
+        <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
         
-        <main className="p-4 md:p-6 lg:p-8 flex-1">
-          <Outlet />
-        </main>
-        
-        <Footer />
+        {/* Main content area */}
+        <div className="flex-1 flex flex-col">
+          <main className="p-4 md:p-6 lg:p-8 flex-1">
+            <Outlet />
+          </main>
+          
+          <Footer />
+        </div>
       </div>
     </div>
   );

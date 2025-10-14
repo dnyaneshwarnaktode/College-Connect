@@ -13,20 +13,21 @@ import {
   X,
   LogOut,
   School,
-  Bot
+  Bot,
+  Bell // <-- Added Bell icon import
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import AIAssistant from '../AIAssistant';
-import Logo from '../Logo';
 
 interface SidebarProps {
-  isOpen: boolean;
-  onClose: () => void;
+  sidebarOpen: boolean;
+  setSidebarOpen: (open: boolean) => void;
 }
 
-export default function Sidebar({ isOpen, onClose }: SidebarProps) {
+export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
   const { user, logout } = useAuth();
   const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);
+  const onClose = () => setSidebarOpen(false);
 
   const getNavigationItems = () => {
     const baseItems = [
@@ -51,7 +52,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
     baseItems.push(
       { name: 'Dashboard', icon: GraduationCap, path: '/dashboard' },
-      { name: 'Settings', icon: Settings, path: '/settings' }
+      // NEW: Notifications link added here
+      { name: 'Notifications', icon: Bell, path: '/notifications' }
     );
 
     return baseItems;
@@ -61,74 +63,92 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   return (
     <>
-      {/* Mobile overlay */}
-      {isOpen && (
+      {/* Click-outside overlay for all screen sizes */}
+      {sidebarOpen && (
         <div 
-          className="fixed inset-0 z-30 bg-black/50 lg:hidden"
+          className="fixed inset-0 z-30 bg-black/50 lg:bg-transparent"
           onClick={onClose}
+          aria-hidden="true"
         />
       )}
 
       {/* Sidebar */}
       <aside className={`
-        fixed top-0 left-0 z-40 h-screen w-64 bg-dark-900 dark:bg-dark-900 border-r border-dark-700 dark:border-dark-700
-        transform transition-transform duration-300 ease-in-out lg:translate-x-0
-        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+        fixed left-0 z-40 w-64 bg-white dark:bg-gray-950 border-r border-slate-200 dark:border-slate-800
+        transform transition-transform duration-300 ease-in-out
+        top-16 h-[calc(100vh-4rem)] 
+        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
+        {/* Mobile close button */}
+        <button
+            onClick={onClose}
+            className="absolute top-4 right-4 p-1 rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 lg:hidden"
+        >
+            <X size={20} />
+        </button>
+        
         <div className="flex flex-col h-full">
-          <div className="flex items-center justify-between p-4 border-b border-dark-700 dark:border-dark-700">
-            <Logo size="md" showText={true} />
-            <button
-              onClick={onClose}
-              className="p-1 rounded hover:bg-dark-800 dark:hover:bg-dark-800 transition-colors lg:hidden"
-            >
-              <X size={18} />
-            </button>
+          {/* New Sidebar Heading */}
+          <div className="px-4 pt-6 pb-2">
+            <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              Menu
+            </h2>
           </div>
 
-          <nav className="flex-1 p-4 space-y-2">
+          {/* Navigation Links */}
+          <nav className="flex-1 p-4 space-y-1">
             {navItems.map((item) => (
               <NavLink
                 key={item.name}
                 to={item.path}
                 onClick={onClose}
                 className={({ isActive }) =>
-                  `flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
+                  `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group text-sm font-medium ${
                     isActive
-                      ? 'bg-darkblue-600 text-white'
-                      : 'text-dark-300 dark:text-dark-300 hover:bg-dark-800 dark:hover:bg-dark-800'
+                      ? 'bg-indigo-600 text-white shadow-md'
+                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                   }`
                 }
               >
-                <item.icon size={20} />
-                <span className="font-medium">{item.name}</span>
+                <item.icon size={20} className="flex-shrink-0" />
+                <span>{item.name}</span>
               </NavLink>
             ))}
           </nav>
 
-          <div className="p-4 border-t border-dark-700 dark:border-dark-700 space-y-2">
+          {/* Sidebar Footer */}
+          <div className="p-4 border-t border-slate-200 dark:border-slate-800">
             <button
               onClick={() => setIsAIAssistantOpen(true)}
-              className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-darkblue-400 dark:text-darkblue-400 hover:bg-dark-800 dark:hover:bg-dark-800 transition-colors"
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-indigo-500 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors duration-200 group text-sm font-medium"
             >
-              <Bot size={20} />
-              <span className="font-medium">AI Assistant</span>
+              <Bot size={20} className="flex-shrink-0" />
+              <span>AI Assistant</span>
             </button>
+            
+            <NavLink
+              to="/settings"
+              onClick={onClose}
+              className="w-full flex items-center gap-3 px-3 py-2.5 mt-1 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200 group text-sm font-medium"
+            >
+              <Settings size={20} className="flex-shrink-0" />
+              <span>Settings</span>
+            </NavLink>
+
             <button
               onClick={() => {
                 logout();
                 onClose();
               }}
-              className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-red-400 dark:text-red-400 hover:bg-red-900/20 dark:hover:bg-red-900/20 transition-colors"
+              className="w-full flex items-center gap-3 px-3 py-2.5 mt-1 rounded-lg text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors duration-200 group text-sm font-medium"
             >
-              <LogOut size={20} />
-              <span className="font-medium">Logout</span>
+              <LogOut size={20} className="flex-shrink-0" />
+              <span>Logout</span>
             </button>
           </div>
         </div>
       </aside>
 
-      {/* AI Assistant Modal */}
       <AIAssistant 
         isOpen={isAIAssistantOpen} 
         onClose={() => setIsAIAssistantOpen(false)} 

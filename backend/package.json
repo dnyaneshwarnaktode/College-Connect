@@ -6,12 +6,10 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "test": "jest",
     "setup-db": "node database/init-database.js",
     "create-indexes": "node database/create-indexes.js",
     "setup": "chmod +x scripts/setup-database.sh && ./scripts/setup-database.sh",
-    "migrate-to-atlas": "node scripts/migrate-to-atlas.js",
-    "test-atlas": "node scripts/test-atlas-connection.js"
+    "migrate-to-atlas": "node scripts/migrate-to-atlas.js"
   },
   "keywords": [
     "college",
@@ -37,8 +35,6 @@
     "openai": "^6.3.0"
   },
   "devDependencies": {
-    "jest": "^29.6.2",
-    "nodemon": "^3.0.1",
-    "supertest": "^6.3.3"
+    "nodemon": "^3.0.1"
   }
 }

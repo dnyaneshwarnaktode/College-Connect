@@ -96,8 +96,8 @@ function Dashboard() {
             <CardSkeleton key={index} />
           ))
         ) : (
-          getDashboardStats.map((stat) => (
-            <div key={stat.title} className="bg-dark-800 dark:bg-dark-800 p-6 rounded-xl shadow-sm border border-dark-700 dark:border-dark-700 hover:shadow-md transition-shadow">
+          getDashboardStats.map((stat, index) => (
+            <div key={`${stat.title}-${index}`} className="bg-dark-800 dark:bg-dark-800 p-6 rounded-xl shadow-sm border border-dark-700 dark:border-dark-700 hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-dark-400 dark:text-dark-400">
