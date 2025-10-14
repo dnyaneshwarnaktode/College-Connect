@@ -70,16 +70,3 @@ Thumbs.db
 # Uploads directory
 uploads/
 backend/uploads/
-
-# Temporary files
-*.tmp
-*.temp
-*.cache
-
-# Database files
-*.db
-*.sqlite
-
-# Test files
-test-results/
-coverage/
