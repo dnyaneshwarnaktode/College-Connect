@@ -8,11 +8,19 @@
       }
     },
     {
-      "src": "api/package.json",
+      "src": "api/test.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
+    {
+      "src": "/api/test",
+      "dest": "/api/test.js"
+    },
+    {
+      "src": "/api/health",
+      "dest": "/api/test.js"
+    },
     {
       "src": "/api/(.*)",
       "dest": "/api/index.js"
@@ -34,6 +42,9 @@
     "VITE_API_URL": "/api"
   },
   "functions": {
+    "api/test.js": {
+      "maxDuration": 10
+    },
     "api/index.js": {
       "maxDuration": 30
     }
