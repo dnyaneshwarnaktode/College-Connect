@@ -32,5 +32,10 @@
   ],
   "env": {
     "VITE_API_URL": "/api"
+  },
+  "functions": {
+    "api/index.js": {
+      "maxDuration": 30
+    }
   }
 }

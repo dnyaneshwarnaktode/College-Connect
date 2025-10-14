@@ -99,11 +99,20 @@ if (process.env.NODE_ENV === 'development') {
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
+  const config = {
+    mongodb: !!process.env.MONGODB_URI,
+    jwt: !!process.env.JWT_SECRET,
+    openai: !!process.env.OPENAI_API_KEY,
+    environment: process.env.NODE_ENV || 'development'
+  };
+  
   res.status(200).json({
     success: true,
     message: 'CollegeConnect API is running',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV
+    environment: process.env.NODE_ENV,
+    configuration: config,
+    status: config.mongodb && config.jwt ? 'ready' : 'configuration_required'
   });
 });
 
@@ -128,7 +137,12 @@ app.use(errorHandler);
 const connectDB = async () => {
   try {
     if (mongoose.connection.readyState === 0) {
-      const conn = await mongoose.connect(process.env.MONGODB_URI);
+      const mongoUri = process.env.MONGODB_URI;
+      if (!mongoUri) {
+        console.error('MONGODB_URI environment variable is not set');
+        throw new Error('Database connection string not configured');
+      }
+      const conn = await mongoose.connect(mongoUri);
       console.log(`MongoDB Connected: ${conn.connection.host}`);
     }
   } catch (error) {
