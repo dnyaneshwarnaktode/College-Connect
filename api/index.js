@@ -66,7 +66,20 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV,
     configuration: config,
-    status: config.mongodb && config.jwt ? 'ready' : 'configuration_required'
+    status: config.mongodb && config.jwt ? 'ready' : 'configuration_required',
+    routesLoaded: routesLoaded
+  });
+});
+
+// Debug endpoint to test basic functionality
+app.get('/api/debug', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Debug endpoint working',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV,
+    nodeVersion: process.version,
+    routesLoaded: routesLoaded
   });
 });
 
