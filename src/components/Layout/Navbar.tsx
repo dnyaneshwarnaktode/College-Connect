@@ -23,7 +23,7 @@ interface Notification {
 }
 
 export default function Navbar({ sidebarOpen, setSidebarOpen }: NavbarProps) {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const { searchQuery, setSearchQuery } = useSearch();
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -111,10 +111,6 @@ export default function Navbar({ sidebarOpen, setSidebarOpen }: NavbarProps) {
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('collegeconnect_token');
-    navigate('/login');
-  };
 
   return (
     <header className="sticky top-0 z-30 bg-white dark:bg-gray-950 border-b border-slate-200 dark:border-slate-800">
