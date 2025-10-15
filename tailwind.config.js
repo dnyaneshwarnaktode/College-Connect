@@ -4,6 +4,11 @@ export default {
   darkMode: 'class',
   theme: {
     extend: {
+      fontFamily: {
+        'montserrat': ['Montserrat', 'sans-serif'],
+        'roboto-condensed': ['Roboto Condensed', 'sans-serif'],
+        'roboto-mono': ['Roboto Mono', 'monospace'],
+      },
       colors: {
         primary: {
           50: '#f0f9ff',
